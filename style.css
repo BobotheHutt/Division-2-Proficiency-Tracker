@@ -3,6 +3,7 @@
 
 body { background: #09090b; color: #f4f4f5; margin: 0; font-family: ui-monospace, monospace; }
 
+[hidden] { display: none !important; }
 .nav-tab, .sub-tab, .toolbar button {
     background: #27272a; color: #d4d4d8; border: 1px solid #3f3f46;
     padding: 6px 12px; border-radius: 4px; cursor: pointer;

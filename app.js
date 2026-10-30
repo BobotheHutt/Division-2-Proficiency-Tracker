@@ -19,6 +19,8 @@ import { turret } from "./data/skills/turret.js";
 import { brands } from "./data/brands.js";
 import { gearSets } from "./data/gearSets.js";
 
+import { cloudEnabled, initCloud, signIn, signOut, loadProgress, saveProgress } from "./cloud.js";
+
 const MAX_RANK = 10;
 const STORAGE_KEY = "d2-proficiency-progress";
 const UI_KEY = "d2-proficiency-ui";
@@ -74,9 +76,27 @@ const activeSubKey = () => {
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const count = items => ({ done: items.filter(i => isDone(i.id)).length, total: items.length });
 
+let currentUser = null;
+let syncTimer = null;
+
+function setSyncStatus(text) {
+    document.getElementById("sync-status").textContent = text;
+}
+
+function persist() {
+    save(STORAGE_KEY, userProgress);
+    if (!currentUser) return;
+    setSyncStatus("Saving...");
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(async () => {
+        try { await saveProgress(currentUser.uid, userProgress); setSyncStatus("Synced"); }
+        catch (err) { console.error(err); setSyncStatus("Sync failed"); }
+    }, 800);
+}
+
 function setRank(id, rank) {
     if (rank > 0) userProgress[id] = rank; else delete userProgress[id];
-    save(STORAGE_KEY, userProgress);
+    persist();
 }
 
 function renderTabs() {
@@ -222,7 +242,7 @@ importInput.addEventListener("change", async () => {
             if (n) clean[id] = n;
         }
         userProgress = clean;
-        save(STORAGE_KEY, userProgress);
+        persist();
         renderAll();
     } catch {
         alert("Couldn't read that file. Use a JSON file exported from this tracker.");
@@ -233,8 +253,43 @@ document.getElementById("reset-btn").addEventListener("click", () => {
     const sub = CATEGORIES[ui.tab].subs[activeSubKey()];
     if (!confirm(`Reset all ranks in "${sub.label}" to 0?`)) return;
     sub.items.forEach(i => delete userProgress[i.id]);
-    save(STORAGE_KEY, userProgress);
+    persist();
     renderAll();
 });
 
 renderAll();
+
+// --- Accounts (optional; the tracker works locally without signing in) ---
+const authBtn = document.getElementById("auth-btn");
+
+async function onUserChange(user) {
+    currentUser = user;
+    authBtn.textContent = user ? "Sign out" : "Sign in with Google";
+    authBtn.disabled = false;
+    if (!user) { setSyncStatus(""); return; }
+    setSyncStatus("Syncing...");
+    try {
+        // On sign-in, keep the higher rank per item from local and cloud.
+        const cloud = await loadProgress(user.uid);
+        const merged = { ...cloud };
+        for (const [id, rank] of Object.entries(userProgress)) merged[id] = Math.max(rank, merged[id] || 0);
+        userProgress = merged;
+        save(STORAGE_KEY, userProgress);
+        await saveProgress(user.uid, userProgress);
+        setSyncStatus(`Synced as ${user.displayName || user.email}`);
+        renderAll();
+    } catch (err) {
+        console.error(err);
+        setSyncStatus("Sync failed");
+    }
+}
+
+if (cloudEnabled) {
+    document.getElementById("account").hidden = false;
+    authBtn.addEventListener("click", async () => {
+        authBtn.disabled = true;
+        try { await (currentUser ? signOut() : signIn()); }
+        catch (err) { console.error(err); authBtn.disabled = false; }
+    });
+    initCloud(onUserChange).then(ok => { if (!ok) document.getElementById("account").hidden = true; });
+}
