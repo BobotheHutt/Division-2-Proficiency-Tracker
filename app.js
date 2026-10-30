@@ -71,6 +71,13 @@ if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 const TONES = { namedWeapons: "named", namedGear: "named", exoticWeapons: "exotic", exoticGear: "exotic" };
 const toneOf = (subKey, tab = ui.tab) => TONES[subKey] || (tab === "gearSets" ? "set" : tab === "brands" ? "brand" : "");
 
+// Optional item icons: icons/manifest.json maps item id -> file name. Missing entries show no icon.
+let iconManifest = {};
+fetch("icons/manifest.json")
+    .then(r => (r.ok ? r.json() : {}))
+    .then(m => { iconManifest = m && typeof m === "object" ? m : {}; if (Object.keys(iconManifest).length) renderItems(); })
+    .catch(() => {});
+
 const rankOf = id => userProgress[id] || 0;
 const isDone = id => rankOf(id) >= MAX_RANK;
 const activeSubKey = () => {
@@ -155,6 +162,7 @@ function renderItems() {
         const done = rank >= MAX_RANK;
         return `<div class="item-row ${done ? "done" : ""}" data-id="${esc(item.id)}" data-tone="${tone}">
             <label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>
+            ${iconManifest[item.id] ? `<img class="item-icon" src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy">` : ""}
             <div class="item-info">
                 <h3>${esc(item.name)}</h3>
                 <span>${esc(item.variant || "")}</span>
