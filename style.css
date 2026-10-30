@@ -271,3 +271,9 @@ body.view-hub #reset-btn { display: none; }
 
 /* Real item icons are white line art: invert them on the light theme so they stay visible. */
 :root[data-theme="light"] .item-icon img { filter: invert(1); }
+
+/* Weapon class icons (image masks that take the current text color) */
+.glyph-mask {
+    display: block; background-color: currentColor;
+    -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat;
+}

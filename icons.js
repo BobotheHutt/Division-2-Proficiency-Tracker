@@ -44,7 +44,14 @@ const LINE = {
     gearSets: `<polygon points="16,3 28,9 16,15 4,9"/><path d="M4 13l12 6 12-6M4 17l12 6 12-6"/>`,
 };
 
+// Weapon class icons are images in icons/class/. They're used as masks so they take the surrounding text color
+// (light/dark theme, orange hover, named/exotic tint) like the drawn glyphs do.
+const CLASS_IMG = new Set(["rifles", "assaultRifles", "marksmanRifles", "shotguns", "smgs", "lmgs", "pistols", "specialization"]);
+
 export function glyph(tab, subKey) {
+    if (tab === "weapons" && CLASS_IMG.has(subKey)) {
+        return `<span class="glyph glyph-mask" style="--src:url('icons/class/${subKey}.png')" aria-hidden="true"></span>`;
+    }
     const key = tab === "brands" || tab === "gearSets" ? tab : subKey;
     if (FILL[key]) return `<svg class="glyph" viewBox="0 0 32 24" fill="currentColor" aria-hidden="true">${FILL[key]}</svg>`;
     if (LINE[key]) return `<svg class="glyph" viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${LINE[key]}</svg>`;
