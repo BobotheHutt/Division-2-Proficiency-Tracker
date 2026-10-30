@@ -53,6 +53,6 @@ export const assaultRifles = [
     { id: "ar_the_railsplitter", name: "The Railsplitter", variant: "Assault Rifle", named: true },
     { id: "ar_chameleon", name: "Chameleon", variant: "Assault Rifle", exotic: true },
     { id: "ar_the_archivist", name: "The Archivist", variant: "Assault Rifle", named: true },
-    { id: "rifle_merciless", name: "Merciless", variant: "Assault Rifle", exotic: true },
-    { id: "ar_caduceus", name: "Caduceus", variant: "Assault Rifle", exotic: true }
+    { id: "ar_caduceus", name: "Caduceus", variant: "Assault Rifle", exotic: true },
+    { id: "ar_steamer", name: "Steamer", variant: "Assault Rifle", named: true }
 ];

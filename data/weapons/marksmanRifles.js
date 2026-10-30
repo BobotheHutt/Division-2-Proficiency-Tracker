@@ -31,7 +31,6 @@ export const marksmanRifles = [
     { id: "mr_tactical_308", name: "Tactical .308", variant: "Marksman Rifle" },
     { id: "mr_scalpel", name: "Scalpel", variant: "Marksman Rifle", named: true },
     { id: "mr_nemesis", name: "Nemesis", variant: "Marksman Rifle", exotic: true },
-    { id: "mr_steamer", name: "Steamer", variant: "Marksman Rifle", named: true },
     { id: "mr_incendia", name: "Incendia", variant: "Marksman Rifle", named: true },
     { id: "mr_prima_donna", name: "Prima Donna", variant: "Marksman Rifle", exotic: true }
 ];

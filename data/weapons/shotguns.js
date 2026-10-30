@@ -22,7 +22,6 @@ export const shotguns = [
     { id: "sg_spas_12", name: "SPAS-12", variant: "Shotgun" },
     { id: "sg_thorn", name: "Thorn", variant: "Shotgun", named: true },
     { id: "sg_lullaby", name: "Lullaby", variant: "Shotgun", exotic: true },
-    { id: "sg_sweet_dreams", name: "Sweet Dreams", variant: "Shotgun", exotic: true },
     { id: "sg_marine_super_90", name: "Marine Super 90", variant: "Shotgun" },
     { id: "sg_super_90", name: "Super 90", variant: "Shotgun" },
     { id: "sg_tactical_super_90_sbs", name: "Tactical Super 90 SBS", variant: "Shotgun" },
