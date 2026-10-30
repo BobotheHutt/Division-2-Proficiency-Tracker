@@ -21,8 +21,17 @@
     <header class="site-header">
         <div class="container header-inner">
             <div class="brand">
-                <span class="brand-mark" aria-hidden="true"></span>
-                <h1>Division 2 Proficiency Tracker</h1>
+                <svg class="brand-emblem" viewBox="0 0 32 36" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="emblemGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#ff6600"/>
+                            <stop offset="1" stop-color="#ffd700"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M16 1.500L29.500 9.250V26.750L16 34.500L2.500 26.750V9.250Z" fill="none" stroke="url(#emblemGrad)" stroke-width="2.200" stroke-linejoin="round"/>
+                    <path d="M9 17.500L16 13L23 17.500M9 23.500L16 19L23 23.500" fill="none" stroke="url(#emblemGrad)" stroke-width="2.400" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h1><span class="brand-name">Division 2</span><span class="brand-sub">Proficiency Tracker</span></h1>
             </div>
             <div class="header-actions">
                 <span id="sync-status" class="sync-status"></span>

@@ -52,8 +52,6 @@ body.view-hub #reset-btn { display: none; }
 .site-header { background: var(--surface); border-bottom: 1px solid var(--border); }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 60px; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.brand-mark { width: 10px; height: 22px; border-radius: 3px; background: var(--accent); flex: none; }
-.brand h1 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: .01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .header-actions { display: flex; align-items: center; gap: 10px; }
 .sync-status { font-size: 12px; color: var(--muted); }
 
@@ -305,7 +303,6 @@ body {
     background-repeat: no-repeat; background-attachment: fixed;
 }
 .site-header { border-image: linear-gradient(90deg, #e8a317, #ff6600 35%, #ffd700 70%, #4ade80) 1; border-bottom-width: 2px; }
-.brand-mark { background: linear-gradient(180deg, #fbbf24, var(--accent)); box-shadow: 0 0 14px rgba(249, 115, 22, .55); }
 body.view-hub #summary-bar { background: linear-gradient(90deg, #e8a317, #ff6600, #ffd700, #4ade80); }
 #summary-pct { color: var(--accent); }
 
@@ -366,3 +363,21 @@ body.view-hub #summary-bar { background: linear-gradient(90deg, #e8a317, #ff6600
 .nav-toggle-hint { display: flex; align-items: center; gap: 6px; flex: none; font-size: 12px; color: var(--muted); }
 .nav-toggle svg { transition: transform .15s; }
 .nav-toggle[aria-expanded="true"] .nav-toggle-hint svg { transform: rotate(180deg); }
+
+/* Site name: emblem + gradient wordmark */
+.brand { gap: 12px; }
+.brand-emblem { width: 30px; height: 34px; flex: none; filter: drop-shadow(0 0 8px rgba(255, 140, 0, .55)); }
+.brand h1 { display: flex; flex-direction: column; gap: 3px; margin: 0; line-height: 1; min-width: 0; font-weight: 400; }
+.brand-name {
+    font-size: 19px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
+    background: linear-gradient(90deg, #ff6600, #ffd700); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.brand-sub { font-size: 10.5px; font-weight: 600; letter-spacing: .36em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+:root[data-theme="light"] .brand-name { background-image: linear-gradient(90deg, #e65c00, #b8860b); }
+:root[data-theme="light"] .brand-emblem { filter: none; }
+@media (max-width: 640px) {
+    .brand { gap: 9px; }
+    .brand-emblem { width: 24px; height: 27px; }
+    .brand-name { font-size: 15px; letter-spacing: .12em; }
+    .brand-sub { font-size: 8.5px; letter-spacing: .26em; }
+}
