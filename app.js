@@ -5,51 +5,82 @@ import { rifles } from "./data/weapons/rifles.js";
 import { marksmanRifles } from "./data/weapons/marksmanRifles.js";
 import { shotguns } from "./data/weapons/shotguns.js";
 import { pistols } from "./data/weapons/pistols.js";
-import { namedGear } from "./data/namedExotic/namedGear.js";
-import { exoticGear } from "./data/namedExotic/exoticGear.js";
+import { masks } from "./data/namedExotic/masks.js";
+import { bodyArmor } from "./data/namedExotic/bodyArmor.js";
+import { backpacks } from "./data/namedExotic/backpacks.js";
+import { gloves } from "./data/namedExotic/gloves.js";
+import { holsters } from "./data/namedExotic/holsters.js";
+import { kneepads } from "./data/namedExotic/kneepads.js";
+import { stickyBomb } from "./data/skills/stickyBomb.js";
+import { trap } from "./data/skills/trap.js";
+import { decoy } from "./data/skills/decoy.js";
+import { pulse } from "./data/skills/pulse.js";
+import { turret } from "./data/skills/turret.js";
+import { hive } from "./data/skills/hive.js";
 import { chemLauncher } from "./data/skills/chemLauncher.js";
-import { drone } from "./data/skills/drone.js";
 import { firefly } from "./data/skills/firefly.js";
 import { mine } from "./data/skills/mine.js";
+import { drone } from "./data/skills/drone.js";
 import { shield } from "./data/skills/shield.js";
-import { hive } from "./data/skills/hive.js";
-import { turret } from "./data/skills/turret.js";
+import { smartCover } from "./data/skills/smartCover.js";
 import { brands } from "./data/brands.js";
 import { gearSets } from "./data/gearSets.js";
 
-import { glyph, tabGlyph } from "./icons.js";
+import { glyph } from "./icons.js";
 import { cloudEnabled, initCloud, signIn, signOut, loadProgress, saveProgress } from "./cloud.js";
 
 const MAX_RANK = 10;
 const STORAGE_KEY = "d2-proficiency-progress";
 const UI_KEY = "d2-proficiency-ui";
 
+// Card order follows the in-game screens.
 const CATEGORIES = {
     weapons: { label: "Weapons", subs: {
-        assaultRifles: { label: "Assault Rifles", items: assaultRifles },
-        smgs: { label: "SMGs", items: smgs },
-        lmgs: { label: "LMGs", items: lmgs },
         rifles: { label: "Rifles", items: rifles },
+        assaultRifles: { label: "Assault Rifles", items: assaultRifles },
         marksmanRifles: { label: "Marksman Rifles", items: marksmanRifles },
         shotguns: { label: "Shotguns", items: shotguns },
+        smgs: { label: "SMGs", items: smgs },
+        lmgs: { label: "LMGs", items: lmgs },
         pistols: { label: "Pistols", items: pistols },
     }},
-    namedExotic: { label: "Named & Exotic", subs: {
-        namedGear: { label: "Named Gear", items: namedGear },
-        exoticGear: { label: "Exotic Gear", items: exoticGear },
+    namedExotic: { label: "Named & Exotic Gear", subs: {
+        masks: { label: "Masks", items: masks },
+        bodyArmor: { label: "Body Armor", items: bodyArmor },
+        backpacks: { label: "Backpacks", items: backpacks },
+        gloves: { label: "Gloves", items: gloves },
+        holsters: { label: "Holsters", items: holsters },
+        kneepads: { label: "Kneepads", items: kneepads },
     }},
     skills: { label: "Skills", subs: {
-        chemLauncher: { label: "Chem Launcher", items: chemLauncher },
-        drone: { label: "Drone", items: drone },
-        firefly: { label: "Firefly", items: firefly },
-        hive: { label: "Hive", items: hive },
-        mine: { label: "Seeker Mine", items: mine },
-        shield: { label: "Ballistic Shield", items: shield },
+        stickyBomb: { label: "Sticky Bomb", items: stickyBomb },
+        trap: { label: "Trap", items: trap },
+        decoy: { label: "Decoy", items: decoy },
+        pulse: { label: "Pulse", items: pulse },
         turret: { label: "Turret", items: turret },
+        hive: { label: "Hive", items: hive },
+        chemLauncher: { label: "Chem Launcher", items: chemLauncher },
+        firefly: { label: "Firefly", items: firefly },
+        mine: { label: "Seeker Mine", items: mine },
+        drone: { label: "Drone", items: drone },
+        shield: { label: "Ballistic Shield", items: shield },
+        smartCover: { label: "Smart Cover", items: smartCover },
     }},
-    brands: { label: "Brands", subs: { all: { label: "All Brands", items: brands } } },
-    gearSets: { label: "Gear Sets", subs: { all: { label: "All Gear Sets", items: gearSets } } },
+    brands: { label: "Brands", subs: { all: { label: "Brands", items: brands } } },
+    gearSets: { label: "Gear Sets", subs: { all: { label: "Gear Sets", items: gearSets } } },
 };
+
+// Sections on the home page. Categories in the same group appear together as quick-switch buttons in the list view.
+const HUB = [
+    { title: "Weapons", tabs: ["weapons"] },
+    { title: "Named & Exotic Gear", tabs: ["namedExotic"] },
+    { title: "Skills", tabs: ["skills"] },
+    { title: "Brands & Gear Sets", tabs: ["brands", "gearSets"] },
+];
+const groupOf = tab => HUB.find(g => g.tabs.includes(tab));
+const entriesOf = group => group.tabs.flatMap(tab =>
+    Object.entries(CATEGORIES[tab].subs).map(([sub, s]) => ({ tab, sub, ...s })));
+const allItems = () => Object.values(CATEGORIES).flatMap(c => Object.values(c.subs).flatMap(s => s.items));
 
 function load(key, fallback) {
     try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -63,10 +94,10 @@ function save(key, value) {
 let userProgress = load(STORAGE_KEY, {});
 const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
+ui.view = "hub"; // always start on the home page
 
-// Color coding, in the spirit of the game: named and brands = gold, exotic = red, gear sets = green.
-const TONES = { namedGear: "named", exoticGear: "exotic" };
-const toneOf = (subKey, tab = ui.tab) => TONES[subKey] || (tab === "gearSets" ? "set" : tab === "brands" ? "brand" : "");
+// Color coding: brands = orange, gear sets = green. Named (gold) and exotic (red) items are flagged in the data.
+const toneOf = tab => (tab === "gearSets" ? "set" : tab === "brands" ? "brand" : "");
 
 // Optional item icons: icons/manifest.json maps item id -> file name. Missing entries show no icon.
 let iconManifest = {};
@@ -87,6 +118,7 @@ const matches = (item, q = query()) => !q || item.name.toLowerCase().includes(q)
 const visible = item => matches(item) && (!ui.hideDone || !isDone(item.id));
 const countVisible = items => items.filter(visible).length;
 const count = items => ({ done: items.filter(i => isDone(i.id)).length, total: items.length });
+const pctOf = ({ done, total }) => (total ? Math.round((done / total) * 100) : 0);
 
 let currentUser = null;
 let syncTimer = null;
@@ -111,58 +143,80 @@ function setRank(id, rank) {
     persist();
 }
 
-// Progress bar + count normally; a match count while searching (tabs without hits are dimmed).
-function tabProgress(items) {
+// --- Home page ---
+function cardHtml(e) {
+    const c = count(e.items);
+    const q = query();
+    let cls = "";
+    let stat = `<small>Proficient with</small><b>${c.done}/${c.total}</b>`;
+    if (q) {
+        const n = countVisible(e.items);
+        cls = n ? "has-match" : "no-match";
+        stat = `<small>${n === 1 ? "Match" : "Matches"}</small><b>${n}</b>`;
+    } else if (c.total && c.done === c.total) {
+        cls = "complete";
+    }
+    return `<button type="button" class="hub-card ${cls}" data-open="${e.tab}|${e.sub}" data-tone="${toneOf(e.tab)}">
+        <span class="hub-id">
+            <span class="hub-icon">${glyph(e.tab, e.sub)}</span>
+            <span class="hub-label">${e.label}</span>
+        </span>
+        <span class="hub-stat">${stat}</span>
+        <span class="hub-bar"><i style="width:${pctOf(c)}%"></i></span>
+    </button>`;
+}
+
+function renderHub() {
+    document.getElementById("hub").innerHTML = HUB.map(g => `
+        <section class="hub-section">
+            <h2>${g.title}</h2>
+            <div class="hub-grid">${entriesOf(g).map(cardHtml).join("")}</div>
+        </section>`).join("");
+}
+
+// --- List view ---
+// Progress bar + count normally; a match count while searching (buttons without hits are dimmed).
+function pillProgress(items) {
     if (query()) {
         const n = countVisible(items);
         return { cls: n ? "has-match" : "no-match",
                  html: `<span class="nav-match">${n ? `${n} ${n === 1 ? "match" : "matches"}` : "No matches"}</span>` };
     }
-    const { done, total } = count(items);
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    return { cls: "", html: `<span class="nav-bar"><i style="width:${pct}%"></i></span><span class="nav-count">${done}/${total}</span>` };
+    const c = count(items);
+    return { cls: "", html: `<span class="nav-bar"><i style="width:${pctOf(c)}%"></i></span><span class="nav-count">${c.done}/${c.total}</span>` };
 }
 
-function renderTabs() {
-    const nav = document.getElementById("main-tabs");
-    nav.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) => {
-        const p = tabProgress(Object.values(cat.subs).flatMap(s => s.items));
-        return `<button class="nav-tab ${key === ui.tab ? "active" : ""} ${p.cls}" data-tab="${key}">
-            <span class="nav-icon">${tabGlyph(key)}</span>
-            <span class="nav-text">
-                <span class="nav-label">${cat.label}</span>
-                <span class="nav-progress">${p.html}</span>
-            </span>
-        </button>`;
-    }).join("");
-}
-
-function renderSubTabs() {
-    const container = document.getElementById("sub-tabs-container");
-    const subs = CATEGORIES[ui.tab].subs;
-    if (Object.keys(subs).length < 2) { container.innerHTML = ""; return; }
+function renderListNav() {
     const active = activeSubKey();
-    container.innerHTML = Object.entries(subs).map(([key, sub]) => {
-        const p = tabProgress(sub.items);
-        return `<button class="sub-tab ${key === active ? "active" : ""} ${p.cls}" data-sub="${key}" data-tone="${toneOf(key)}">
-            <span class="nav-icon">${glyph(ui.tab, key)}</span>
-            <span class="nav-text">
-                <span class="nav-label">${sub.label}</span>
-                <span class="nav-progress">${p.html}</span>
-            </span>
-        </button>`;
-    }).join("");
+    document.getElementById("sub-tabs-container").innerHTML =
+        `<button type="button" class="back-btn" data-back>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+            All categories
+        </button>` +
+        entriesOf(groupOf(ui.tab)).map(e => {
+            const p = pillProgress(e.items);
+            const on = e.tab === ui.tab && e.sub === active;
+            return `<button type="button" class="sub-tab ${on ? "active" : ""} ${p.cls}" data-open="${e.tab}|${e.sub}" data-tone="${toneOf(e.tab)}">
+                <span class="nav-icon">${glyph(e.tab, e.sub)}</span>
+                <span class="nav-text">
+                    <span class="nav-label">${e.label}</span>
+                    <span class="nav-progress">${p.html}</span>
+                </span>
+            </button>`;
+        }).join("");
 }
 
 function renderSummary() {
-    const sub = CATEGORIES[ui.tab].subs[activeSubKey()];
-    const { done, total } = count(sub.items);
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    document.getElementById("summary-label").textContent = query()
-        ? `${sub.label}: ${countVisible(sub.items)} of ${total} match "${ui.search.trim()}"`
-        : `${sub.label}: ${done}/${total} proficient`;
-    document.getElementById("summary-pct").textContent = `${pct}%`;
-    document.getElementById("summary-bar").style.width = `${pct}%`;
+    const label = document.getElementById("summary-label");
+    let items, name;
+    if (ui.view === "hub") { items = allItems(); name = "Overall"; }
+    else { const sub = CATEGORIES[ui.tab].subs[activeSubKey()]; items = sub.items; name = sub.label; }
+    const c = count(items);
+    label.textContent = query()
+        ? `${name}: ${countVisible(items)} of ${c.total} match "${ui.search.trim()}"`
+        : `${name}: ${c.done}/${c.total} proficient`;
+    document.getElementById("summary-pct").textContent = `${pctOf(c)}%`;
+    document.getElementById("summary-bar").style.width = `${pctOf(c)}%`;
 }
 
 function renderItems() {
@@ -171,14 +225,14 @@ function renderItems() {
     const items = sub.items.filter(visible).sort((a, b) => a.name.localeCompare(b.name));
 
     if (!items.length) {
-        const elsewhere = countVisible(Object.values(CATEGORIES).flatMap(c => Object.values(c.subs).flatMap(s => s.items)));
+        const elsewhere = countVisible(allItems());
         grid.innerHTML = `<div class="empty">${query() || ui.hideDone
-            ? `Nothing here matches.${elsewhere ? ` ${elsewhere} ${elsewhere === 1 ? "match is" : "matches are"} in the highlighted tabs.` : ""}`
-            : "No items in this category yet."}</div>`;
+            ? `Nothing here matches.${elsewhere ? ` ${elsewhere} ${elsewhere === 1 ? "match is" : "matches are"} in the highlighted categories.` : ""}`
+            : "No items here yet."}</div>`;
         return;
     }
 
-    const tone = toneOf(activeSubKey());
+    const tone = toneOf(ui.tab);
     const icon = glyph(ui.tab, activeSubKey());
     grid.innerHTML = items.map(item => {
         const rank = rankOf(item.id);
@@ -200,10 +254,14 @@ function renderItems() {
 }
 
 function renderAll() {
-    renderTabs();
-    renderSubTabs();
+    const hub = ui.view === "hub";
+    document.body.classList.toggle("view-hub", hub);
+    document.getElementById("hub").hidden = !hub;
+    document.getElementById("list-view").hidden = hub;
+    document.getElementById("list-nav").hidden = hub;
     renderSummary();
-    renderItems();
+    if (hub) renderHub();
+    else { renderListNav(); renderItems(); }
 }
 
 // Update one row in place so dragging a slider isn't interrupted by a re-render.
@@ -216,19 +274,36 @@ function refreshRow(row) {
     slider.value = rank;
     slider.style.setProperty("--pct", `${rank * 10}%`);
     row.querySelector(".proficient-checkbox").checked = rank >= MAX_RANK;
-    renderTabs();
-    renderSubTabs();
+    renderListNav();
     renderSummary();
 }
 
-document.addEventListener("click", e => {
-    const tab = e.target.closest("[data-tab]");
-    const sub = e.target.closest("[data-sub]");
-    if (tab) { ui.tab = tab.dataset.tab; }
-    else if (sub) { ui.subs[ui.tab] = sub.dataset.sub; }
-    else return;
+// --- Navigation: home page <-> list view (browser/phone back returns home) ---
+function openCategory(tab, sub) {
+    if (!CATEGORIES[tab]?.subs[sub]) return;
+    const fromHub = ui.view === "hub";
+    ui.tab = tab;
+    ui.subs[tab] = sub;
+    ui.view = "list";
+    if (fromHub) history.pushState({ v: "list" }, "");
     save(UI_KEY, ui);
     renderAll();
+    window.scrollTo(0, 0);
+}
+function goHome() {
+    if (history.state?.v === "list") { history.back(); return; }
+    ui.view = "hub";
+    renderAll();
+}
+window.addEventListener("popstate", e => {
+    ui.view = e.state?.v === "list" ? "list" : "hub";
+    renderAll();
+});
+
+document.addEventListener("click", e => {
+    const open = e.target.closest("[data-open]");
+    if (open) { openCategory(...open.dataset.open.split("|")); return; }
+    if (e.target.closest("[data-back]")) goHome();
 });
 
 const grid = document.getElementById("items-grid");
@@ -250,9 +325,9 @@ grid.addEventListener("change", e => {
 const searchBox = document.getElementById("search");
 searchBox.value = ui.search;
 
-// If the current category has no hits, jump to the first one that does (current tab's categories first).
+// In the list view, if this category has no hits, jump to the first one that does.
 function jumpToFirstMatch() {
-    if (!query() || countVisible(CATEGORIES[ui.tab].subs[activeSubKey()].items)) return;
+    if (ui.view !== "list" || !query() || countVisible(CATEGORIES[ui.tab].subs[activeSubKey()].items)) return;
     const tabs = [ui.tab, ...Object.keys(CATEGORIES).filter(k => k !== ui.tab)];
     for (const tab of tabs) {
         for (const [subKey, sub] of Object.entries(CATEGORIES[tab].subs)) {

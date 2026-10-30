@@ -28,10 +28,18 @@ const LINE = {
     mine: `<circle cx="16" cy="12" r="6"/><circle cx="16" cy="12" r="1.6"/><path d="M16 2v4M16 18v4M6 12h4M22 12h4M9 5l3 3M23 5l-3 3M9 19l3-3M23 19l-3-3"/>`,
     shield: `<path d="M16 2.5l9 3v7c0 5-4 8-9 9.5-5-1.5-9-4.5-9-9.5v-7z"/><path d="M16 7v11M11 11h10"/>`,
     turret: `<rect x="10" y="7" width="10" height="6" rx="1.5"/><path d="M20 9h9v2h-9zM15 13l-5 8M15 13l5 8M12 17.5h6"/>`,
-    namedGear: `<path d="M10 3l3 2h6l3-2 5 4-3 4v11H8V11L5 7z"/>`,
-    exoticGear: `<path d="M10 3l3 2h6l3-2 5 4-3 4v11H8V11L5 7z"/>`,
+    masks: `<path d="M8 9c0-3.5 3.5-6 8-6s8 2.5 8 6v4c0 4-3.5 8-8 8s-8-4-8-8z"/><circle cx="12.5" cy="11" r="2"/><circle cx="19.5" cy="11" r="2"/><path d="M13 16.5h6M16 14v3"/>`,
+    bodyArmor: `<path d="M10 3l3 2h6l3-2 5 4-3 4v11H8V11L5 7z"/>`,
+    backpacks: `<rect x="9" y="6" width="14" height="16" rx="5"/><path d="M12.5 6V4.5a3.5 3.5 0 0 1 7 0V6M12 15h8v5h-8zM12 11.5h8"/>`,
+    gloves: `<rect x="10" y="12" width="12" height="9" rx="3"/><path d="M11.5 12V6.5M15 12V4.5M18.5 12V5.5M22 12.5V9M10.5 16L7 12.5"/>`,
+    holsters: `<path d="M9 4h10a2 2 0 0 1 2 2v4H9z"/><path d="M10.5 10h7l-1.2 10.2a1.6 1.6 0 0 1-1.6 1.4h-1.6a1.6 1.6 0 0 1-1.6-1.4z"/><path d="M21 7h3"/>`,
+    kneepads: `<path d="M16 3c-5 0-8 2-8 5.5 0 2.6 1 3.6 2 5.5 1 2.5 3 5 6 5s5-2.5 6-5c1-1.900 2-2.900 2-5.500C24 5 21 3 16 3z"/><circle cx="16" cy="11" r="3.5"/>`,
+    stickyBomb: `<circle cx="14" cy="14" r="7"/><path d="M19 9l3-4M22 5l1.500 1.500M20.500 3.500L24 7M10.500 12a4 4 0 0 1 3-2.500"/>`,
+    trap: `<path d="M3 19l4-9 3.500 6L16 4l5.500 12 3.500-6 4 9z"/>`,
+    decoy: `<circle cx="16" cy="12" r="8"/><circle cx="16" cy="12" r="3"/><path d="M16 4v2M16 18v2M8 12h2M22 12h2"/>`,
+    pulse: `<circle cx="16" cy="12" r="2"/><path d="M11.500 7.500a6.500 6.500 0 0 0 0 9M20.500 7.500a6.500 6.500 0 0 1 0 9M7.500 4.500a12 12 0 0 0 0 15M24.500 4.500a12 12 0 0 1 0 15"/>`,
+    smartCover: `<path d="M5 20V8l6-3h10l6 3v12z"/><path d="M3 20h26M11 20v-8h10v8"/>`,
     brands: `<path d="M6 12V6a1 1 0 0 1 1-1h6.5L26 17.5 18.5 25 6 12z" transform="translate(0 -1.5)"/><circle cx="10.5" cy="8.5" r="1.4"/>`,
-    namedExotic: `<polygon points="${star(16, 12.5, 10, 4.4)}"/>`,
     gearSets: `<polygon points="16,3 28,9 16,15 4,9"/><path d="M4 13l12 6 12-6M4 17l12 6 12-6"/>`,
 };
 
@@ -42,5 +50,3 @@ export function glyph(tab, subKey) {
     return "";
 }
 
-const TAB_ICON = { weapons: "assaultRifles", namedExotic: "namedExotic", skills: "drone", brands: "brands", gearSets: "gearSets" };
-export const tabGlyph = tab => glyph(tab, TAB_ICON[tab]) || glyph("", TAB_ICON[tab]);

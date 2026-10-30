@@ -55,7 +55,7 @@
                                 <button type="button" class="btn" id="export-btn">Export</button>
                                 <button type="button" class="btn" id="import-btn">Import</button>
                             </div>
-                            <button type="button" class="btn danger full" id="reset-btn">Reset current tab</button>
+                            <button type="button" class="btn danger full" id="reset-btn">Reset current category</button>
                             <input id="import-input" type="file" accept="application/json,.json" hidden>
                         </section>
                         <section>
@@ -71,13 +71,10 @@
                 </div>
             </div>
         </div>
-        <nav class="main-nav" aria-label="Categories">
-            <div class="container tabs" id="main-tabs"></div>
-        </nav>
     </header>
 
     <div class="sticky-group">
-    <div class="subbar">
+    <div class="subbar" id="list-nav" hidden>
         <div class="container tabs" id="sub-tabs-container"></div>
     </div>
 
@@ -94,7 +91,7 @@
         <div class="toolbar">
             <div class="search-wrap">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input id="search" type="search" placeholder="Search everything (press / to focus)" autocomplete="off">
+                <input id="search" type="search" placeholder="Search everything" title="Press / to focus" autocomplete="off">
             </div>
             <label class="chip-toggle"><input type="checkbox" id="hide-done"><span>Hide completed</span></label>
         </div>
@@ -103,9 +100,12 @@
     </div>
     </div>
 
-    <main class="container narrow">
-        <div id="items-grid"></div>
-        <p class="hint">Set a rank to <b>10</b>, or tick the box, to mark an item proficient.</p>
+    <main class="container">
+        <div id="hub"></div>
+        <div id="list-view" hidden>
+            <div id="items-grid"></div>
+            <p class="hint">Set a rank to <b>10</b>, or tick the box, to mark an item proficient.</p>
+        </div>
     </main>
 
     <footer class="site-footer">
