@@ -38,10 +38,11 @@ button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .muted { color: var(--muted); }
 .container { max-width: 72rem; margin: 0 auto; padding: 0 20px; }
-.container.narrow { max-width: 46rem; padding-top: 24px; padding-bottom: 48px; }
+.container.narrow { max-width: 46rem; padding-top: 16px; padding-bottom: 48px; }
 
 /* Header */
-.site-header { position: sticky; top: 0; z-index: 50; background: var(--surface); border-bottom: 1px solid var(--border); }
+.fixed-top { position: sticky; top: 0; z-index: 50; }
+.site-header { background: var(--surface); border-bottom: 1px solid var(--border); }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 60px; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .brand-mark { width: 10px; height: 22px; border-radius: 3px; background: var(--accent); flex: none; }
@@ -127,25 +128,27 @@ button { cursor: pointer; }
 .tab-count { margin-left: 5px; font-size: 12px; font-weight: 500; opacity: .65; font-variant-numeric: tabular-nums; }
 
 /* Summary + toolbar */
-.summary { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; }
-.summary-text { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-#summary-label { font-size: 15px; font-weight: 700; }
+.controls { background: var(--bg); border-bottom: 1px solid var(--border); }
+.controls-inner { max-width: 46rem; margin: 0 auto; padding: 12px 20px 12px; }
+.summary { margin-bottom: 10px; }
+.summary-text { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+#summary-label { font-size: 14px; font-weight: 700; }
 #summary-pct { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
 .bar { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
 .bar > div { height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width .25s; }
-.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.toolbar { display: flex; gap: 10px; align-items: center; }
 .search-wrap { position: relative; flex: 1 1 200px; color: var(--muted); }
 .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
 .search-wrap input {
     width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-    padding: 9px 12px 9px 36px; color: var(--text);
+    padding: 8px 12px 8px 36px; color: var(--text);
 }
 .search-wrap input::placeholder { color: var(--muted); }
 .search-wrap input:focus { outline: none; border-color: var(--accent); }
 .chip-toggle { cursor: pointer; }
 .chip-toggle input { position: absolute; opacity: 0; pointer-events: none; }
 .chip-toggle span {
-    display: inline-block; padding: 8px 14px; border-radius: 8px; font-size: 13px;
+    display: inline-block; padding: 7px 14px; border-radius: 8px; white-space: nowrap; font-size: 13px;
     background: var(--surface); border: 1px solid var(--border); color: var(--muted); transition: all .15s;
 }
 .chip-toggle input:checked + span { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
@@ -169,7 +172,6 @@ button { cursor: pointer; }
 .item-row.done { border-color: var(--accent); background: linear-gradient(90deg, var(--accent-soft), var(--surface) 60%); }
 .compact .item-row { padding: 6px 14px; }
 .compact #items-grid { gap: 4px; }
-.compact .item-info span { display: none; }
 
 .check input {
     appearance: none; width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border);
@@ -209,12 +211,14 @@ button { cursor: pointer; }
 .about p { font-size: 12px; line-height: 1.5; }
 
 @media (max-width: 640px) {
-    .site-header { position: static; }
+    .fixed-top { display: contents; }
+    .controls { position: sticky; top: 0; z-index: 50; }
+    .controls-inner { padding: 10px 14px; }
     .nav-tab { min-width: 140px; }
     .container { padding: 0 14px; }
     .brand h1 { font-size: 15px; }
     .sync-status { display: none; }
     .item-row { flex-wrap: wrap; row-gap: 10px; }
-    .item-info { flex-basis: calc(100% - 40px); }
+    .item-info { flex: 1 1 0; }
     .rank-wrap { width: 100%; }
 }

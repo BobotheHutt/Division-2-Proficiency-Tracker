@@ -17,6 +17,7 @@
 </head>
 <body>
 
+    <div class="fixed-top">
     <header class="site-header">
         <div class="container header-inner">
             <div class="brand">
@@ -79,7 +80,8 @@
         <div class="container tabs" id="sub-tabs-container"></div>
     </div>
 
-    <main class="container narrow">
+    <div class="controls">
+        <div class="controls-inner">
         <div class="summary">
             <div class="summary-text">
                 <span id="summary-label"></span>
@@ -95,7 +97,11 @@
             </div>
             <label class="chip-toggle"><input type="checkbox" id="hide-done"><span>Hide completed</span></label>
         </div>
+        </div>
+    </div>
+    </div>
 
+    <main class="container narrow">
         <div id="items-grid"></div>
         <p class="hint">Set a rank to <b>10</b>, or tick the box, to mark an item proficient.</p>
     </main>

@@ -181,7 +181,6 @@ function renderItems() {
                 : `<span class="item-icon">${icon}</span>`}
             <div class="item-info">
                 <h3>${esc(item.name)}</h3>
-                <span>${esc(item.variant || "")}</span>
             </div>
             <div class="rank-wrap">
                 <input type="range" class="rank-slider" min="0" max="${MAX_RANK}" value="${rank}" style="--pct:${rank * 10}%" aria-label="Rank: ${esc(item.name)}">
