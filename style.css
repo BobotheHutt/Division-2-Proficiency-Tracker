@@ -265,3 +265,9 @@ body.view-hub #reset-btn { display: none; }
     .item-info { flex: 1 1 0; }
     .rank-wrap { width: 100%; }
 }
+
+/* Real item icons are white line art: invert them on the light theme so they stay visible. */
+:root[data-theme="light"] .item-icon img { filter: invert(1); }
+
+/* Real item icons are white line art: invert them on the light theme so they stay visible. */
+:root[data-theme="light"] .item-icon img { filter: invert(1); }
