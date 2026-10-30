@@ -383,11 +383,17 @@ body.view-hub #summary-bar { background: linear-gradient(90deg, #e8a317, #ff6600
 }
 
 /* ---------- Background options (Settings > Appearance > Background) ---------- */
-:root { --pat-color: #fff; --pat-opacity: .06; --bg-blur: 0px; --bg-dim: .55; }
-:root[data-theme="light"] { --pat-color: #000; --pat-opacity: .08; }
+:root {
+    --pat-bg: linear-gradient(120deg, #ff6600 0%, #e8a317 28%, #ffd700 52%, #4ade80 80%, #22c55e 100%);
+    --pat-opacity: .2; --bg-blur: 0px; --bg-dim: .55;
+}
+:root[data-theme="light"] {
+    --pat-bg: linear-gradient(120deg, #e65c00 0%, #b8860b 28%, #ca8a04 52%, #16a34a 80%, #15803d 100%);
+    --pat-opacity: .24;
+}
 body::before {
     content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; display: none;
-    background: var(--pat-color); opacity: var(--pat-opacity);
+    background: var(--pat-bg); opacity: var(--pat-opacity);
     -webkit-mask-image: var(--pat-img); mask-image: var(--pat-img);
     -webkit-mask-size: var(--pat-size); mask-size: var(--pat-size);
 }
