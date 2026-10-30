@@ -212,7 +212,8 @@ button { cursor: pointer; }
 
 @media (max-width: 640px) {
     .fixed-top { display: contents; }
-    .controls { position: sticky; top: 0; z-index: 50; }
+    .sticky-group { position: sticky; top: 0; z-index: 50; background: var(--bg); }
+    .subbar .tabs { padding-top: 8px; padding-bottom: 8px; }
     .controls-inner { padding: 10px 14px; }
     .nav-tab { min-width: 140px; }
     .container { padding: 0 14px; }
