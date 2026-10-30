@@ -94,7 +94,7 @@ function save(key, value) {
 
 // userProgress: { [itemId]: rank }
 let userProgress = load(STORAGE_KEY, {});
-const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true }, load(UI_KEY, {}));
+const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0 }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 ui.view = "hub"; // always start on the home page
 
@@ -476,6 +476,105 @@ compactToggle.addEventListener("change", () => { ui.compact = compactToggle.chec
 
 applyTheme();
 applyCompact();
+
+// --- Background: patterns, or a picture kept only in this browser (IndexedDB) ---
+const bgLayerImg = document.querySelector("#bg-layer .bg-img");
+const bgControls = document.getElementById("bg-image-controls");
+const bgHint = document.getElementById("bg-hint");
+let bgUrl = null;
+
+function idb() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open("d2-tracker", 1);
+        req.onupgradeneeded = () => req.result.createObjectStore("files");
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+async function idbDo(mode, fn) {
+    const db = await idb();
+    return new Promise((resolve, reject) => {
+        const req = fn(db.transaction("files", mode).objectStore("files"));
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+const bgStore = {
+    get: () => idbDo("readonly", s => s.get("background")),
+    set: blob => idbDo("readwrite", s => s.put(blob, "background")),
+    del: () => idbDo("readwrite", s => s.delete("background")),
+};
+
+function showBgImage(blob) {
+    if (bgUrl) URL.revokeObjectURL(bgUrl);
+    bgUrl = blob ? URL.createObjectURL(blob) : null;
+    bgLayerImg.style.backgroundImage = bgUrl ? `url("${bgUrl}")` : "none";
+    document.getElementById("bg-clear").disabled = !bgUrl;
+    bgHint.textContent = bgUrl ? "Saved only in this browser." : "No picture yet. Choose one from your device.";
+}
+
+function applyBg() {
+    document.documentElement.dataset.bg = ui.bg;
+    document.documentElement.style.setProperty("--bg-dim", String(ui.bgDim / 100));
+    document.documentElement.style.setProperty("--bg-blur", `${ui.bgBlur}px`);
+    document.querySelectorAll("[data-bg-choice]").forEach(b => b.classList.toggle("active", b.dataset.bgChoice === ui.bg));
+    bgControls.hidden = ui.bg !== "image";
+    document.getElementById("bg-dim").value = ui.bgDim;
+    document.getElementById("bg-blur").value = ui.bgBlur;
+}
+
+// Shrink big photos so they stay light and sharp enough for a background.
+async function prepareImage(file) {
+    const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const scale = Math.min(1, 1920 / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    return new Promise((resolve, reject) => canvas.toBlob(b => (b ? resolve(b) : reject(new Error("encode failed"))), "image/jpeg", 0.85));
+}
+
+document.getElementById("bg-options").addEventListener("click", e => {
+    const b = e.target.closest("[data-bg-choice]");
+    if (!b) return;
+    ui.bg = b.dataset.bgChoice;
+    save(UI_KEY, ui);
+    applyBg();
+});
+const bgFile = document.getElementById("bg-file");
+document.getElementById("bg-pick").addEventListener("click", () => bgFile.click());
+bgFile.addEventListener("change", async () => {
+    const file = bgFile.files[0];
+    bgFile.value = "";
+    if (!file) return;
+    try {
+        const blob = await prepareImage(file);
+        await bgStore.set(blob);
+        showBgImage(blob);
+        ui.bg = "image";
+        save(UI_KEY, ui);
+        applyBg();
+    } catch (err) {
+        console.error(err);
+        bgHint.textContent = "Couldn't use that file. Try a JPG or PNG.";
+    }
+});
+document.getElementById("bg-clear").addEventListener("click", async () => {
+    try { await bgStore.del(); } catch (err) { console.error(err); }
+    showBgImage(null);
+    if (ui.bg === "image") { ui.bg = "glow"; save(UI_KEY, ui); }
+    applyBg();
+});
+for (const [id, key] of [["bg-dim", "bgDim"], ["bg-blur", "bgBlur"]]) {
+    document.getElementById(id).addEventListener("input", e => {
+        ui[key] = Number(e.target.value);
+        save(UI_KEY, ui);
+        applyBg();
+    });
+}
+applyBg();
+showBgImage(null);
+bgStore.get().then(blob => { if (blob) showBgImage(blob); }).catch(() => {});
 
 // --- Accounts (optional; the tracker works locally without signing in) ---
 const authButtons = document.querySelectorAll("[data-auth]");

@@ -8,6 +8,7 @@
         // Apply the saved theme before first paint to avoid a flash.
         try {
             const t = (JSON.parse(localStorage.getItem("d2-proficiency-ui")) || {}).theme || "dark";
+            document.documentElement.dataset.bg = (JSON.parse(localStorage.getItem("d2-proficiency-ui")) || {}).bg || "glow";
             document.documentElement.dataset.theme = t === "system"
                 ? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark") : t;
         } catch (e) {}
@@ -16,6 +17,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="bg-layer" aria-hidden="true"><div class="bg-img"></div><div class="bg-dim"></div></div>
 
     <div class="fixed-top">
     <header class="site-header">
@@ -57,6 +59,24 @@
                                 <span>Compact rows</span>
                                 <input type="checkbox" id="compact-toggle">
                             </label>
+                            <span class="field-label">Background</span>
+                            <div class="segmented five" id="bg-options" role="group" aria-label="Background">
+                                <button type="button" data-bg-choice="glow">Glow</button>
+                                <button type="button" data-bg-choice="grid">Grid</button>
+                                <button type="button" data-bg-choice="hex">Hex</button>
+                                <button type="button" data-bg-choice="none">Plain</button>
+                                <button type="button" data-bg-choice="image">Image</button>
+                            </div>
+                            <div id="bg-image-controls" hidden>
+                                <div class="btn-row">
+                                    <button type="button" class="btn" id="bg-pick">Choose picture</button>
+                                    <button type="button" class="btn danger" id="bg-clear">Remove</button>
+                                </div>
+                                <label class="range-row"><span>Dim</span><input type="range" id="bg-dim" min="0" max="90"></label>
+                                <label class="range-row"><span>Blur</span><input type="range" id="bg-blur" min="0" max="20"></label>
+                                <p class="muted tiny" id="bg-hint"></p>
+                                <input type="file" id="bg-file" accept="image/*" hidden>
+                            </div>
                         </section>
                         <section>
                             <h2>Data</h2>
