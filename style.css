@@ -211,11 +211,16 @@ button { cursor: pointer; }
 .about p { font-size: 12px; line-height: 1.5; }
 
 @media (max-width: 640px) {
-    .fixed-top { display: contents; }
-    .sticky-group { position: sticky; top: 0; z-index: 50; background: var(--bg); }
-    .subbar .tabs { padding-top: 8px; padding-bottom: 8px; }
-    .controls-inner { padding: 10px 14px; }
-    .nav-tab { min-width: 140px; }
+    /* Title bar scrolls away; tabs, categories, summary and search stay pinned. */
+    .fixed-top { top: -61px; }
+    .main-nav .tabs { gap: 6px; padding-bottom: 8px; }
+    .nav-tab { min-width: 132px; padding: 6px 10px; gap: 8px; }
+    .nav-icon { width: 28px; height: 28px; }
+    .nav-icon .glyph { width: 20px; height: 15px; }
+    .subbar .tabs { padding-top: 6px; padding-bottom: 6px; gap: 6px; }
+    .sub-tab { min-width: 124px; padding: 5px 10px; }
+    .controls-inner { padding: 8px 14px; }
+    .summary { margin-bottom: 8px; }
     .container { padding: 0 14px; }
     .brand h1 { font-size: 15px; }
     .sync-status { display: none; }
