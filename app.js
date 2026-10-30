@@ -94,7 +94,7 @@ function save(key, value) {
 
 // userProgress: { [itemId]: rank }
 let userProgress = load(STORAGE_KEY, {});
-const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false }, load(UI_KEY, {}));
+const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 ui.view = "hub"; // always start on the home page
 
@@ -200,19 +200,36 @@ function pillProgress(items) {
 
 function renderListNav() {
     const active = activeSubKey();
-    document.getElementById("sub-tabs-container").innerHTML =
-        "" +
-        entriesOf(groupOf(ui.tab)).map(e => {
-            const p = pillProgress(e.items);
-            const on = e.tab === ui.tab && e.sub === active;
-            return `<button type="button" class="sub-tab ${on ? "active" : ""} ${p.cls}" data-open="${e.tab}|${e.sub}" data-tone="${toneOf(e.tab)}">
-                <span class="nav-icon">${glyph(e.tab, e.sub)}</span>
-                <span class="nav-text">
-                    <span class="nav-label">${e.label}</span>
-                    <span class="nav-progress">${p.html}</span>
-                </span>
-            </button>`;
-        }).join("");
+    const entries = entriesOf(groupOf(ui.tab));
+    const cur = entries.find(e => e.tab === ui.tab && e.sub === active);
+    const q = query();
+    const c = count(cur.items);
+    const stat = q ? `${countVisible(cur.items)} ${countVisible(cur.items) === 1 ? "match" : "matches"}` : `${c.done}/${c.total}`;
+    const withHits = q ? entries.filter(e => countVisible(e.items) > 0).length : 0;
+    const hint = ui.navOpen ? "Hide categories" : (q ? `${withHits} with matches` : "Switch category");
+    const cards = entries.map(e => {
+        const p = pillProgress(e.items);
+        const on = e.tab === ui.tab && e.sub === active;
+        return `<button type="button" class="sub-tab ${on ? "active" : ""} ${p.cls}" data-open="${e.tab}|${e.sub}" data-tone="${toneOf(e.tab)}">
+            <span class="nav-icon">${glyph(e.tab, e.sub)}</span>
+            <span class="nav-text">
+                <span class="nav-label">${e.label}</span>
+                <span class="nav-progress">${p.html}</span>
+            </span>
+        </button>`;
+    }).join("");
+    document.getElementById("list-nav").innerHTML = `
+        <button type="button" class="nav-toggle" data-nav-toggle aria-expanded="${ui.navOpen}">
+            <span class="nav-toggle-main">
+                <span class="nav-icon">${glyph(cur.tab, cur.sub)}</span>
+                <span class="nav-toggle-label">${cur.label}</span>
+                <span class="nav-toggle-count">${stat}</span>
+            </span>
+            <span class="nav-toggle-hint">${hint}
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+        </button>
+        <div class="subnav" ${ui.navOpen ? "" : "hidden"}>${cards}</div>`;
 }
 
 function renderSummary() {
@@ -320,6 +337,12 @@ window.addEventListener("popstate", e => {
 });
 
 document.addEventListener("click", e => {
+    if (e.target.closest("[data-nav-toggle]")) {
+        ui.navOpen = !ui.navOpen;
+        save(UI_KEY, ui);
+        renderListNav();
+        return;
+    }
     const open = e.target.closest("[data-open]");
     if (open) { openCategory(...open.dataset.open.split("|")); return; }
     if (e.target.closest("[data-back]")) goHome();
