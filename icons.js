@@ -28,7 +28,6 @@ const LINE = {
     mine: `<circle cx="16" cy="12" r="6"/><circle cx="16" cy="12" r="1.6"/><path d="M16 2v4M16 18v4M6 12h4M22 12h4M9 5l3 3M23 5l-3 3M9 19l3-3M23 19l-3-3"/>`,
     shield: `<path d="M16 2.5l9 3v7c0 5-4 8-9 9.5-5-1.5-9-4.5-9-9.5v-7z"/><path d="M16 7v11M11 11h10"/>`,
     turret: `<rect x="10" y="7" width="10" height="6" rx="1.5"/><path d="M20 9h9v2h-9zM15 13l-5 8M15 13l5 8M12 17.5h6"/>`,
-    namedWeapons: `<circle cx="16" cy="12" r="7"/><circle cx="16" cy="12" r="1.5"/><path d="M16 2v5M16 17v5M6 12h5M21 12h5"/>`,
     exoticWeapons: `<circle cx="16" cy="12" r="7"/><circle cx="16" cy="12" r="1.5"/><path d="M16 2v5M16 17v5M6 12h5M21 12h5"/>`,
     namedGear: `<path d="M10 3l3 2h6l3-2 5 4-3 4v11H8V11L5 7z"/>`,
     exoticGear: `<path d="M10 3l3 2h6l3-2 5 4-3 4v11H8V11L5 7z"/>`,

@@ -1,4 +1,5 @@
 export const smgs = [
+    { id: "smg_achilles", name: "Achilles", variant: "SMG", named: true },
     { id: "smg_cmmg_banshee", name: "CMMG Banshee", variant: "SMG" },
     { id: "smg_mp5", name: "MP5", variant: "SMG" },
     { id: "smg_mp5_n", name: "MP5-N", variant: "SMG" },
