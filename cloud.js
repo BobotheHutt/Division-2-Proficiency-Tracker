@@ -12,12 +12,12 @@ export async function initCloud(onUser) {
         const [app, a, f] = await Promise.all([
             import(`${SDK}/firebase-app.js`),
             import(`${SDK}/firebase-auth.js`),
-            import(`${SDK}/firebase-firestore.js`),
+            import(`${SDK}/firebase-database.js`),
         ]);
         fb = { ...a, ...f };
         const application = app.initializeApp(firebaseConfig);
         auth = a.getAuth(application);
-        db = f.getFirestore(application);
+        db = f.getDatabase(application);
         a.onAuthStateChanged(auth, onUser);
         return true;
     } catch (err) {
@@ -30,9 +30,9 @@ export const signIn = () => fb.signInWithPopup(auth, new fb.GoogleAuthProvider()
 export const signOut = () => fb.signOut(auth);
 
 export async function loadProgress(uid) {
-    const snap = await fb.getDoc(fb.doc(db, "users", uid));
-    return snap.exists() ? snap.data().progress || {} : {};
+    const snap = await fb.get(fb.ref(db, `users/${uid}/progress`));
+    return snap.exists() ? snap.val() : {};
 }
 
 export const saveProgress = (uid, progress) =>
-    fb.setDoc(fb.doc(db, "users", uid), { progress, updatedAt: Date.now() });
+    fb.set(fb.ref(db, `users/${uid}`), { progress, updatedAt: Date.now() });

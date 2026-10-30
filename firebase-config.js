@@ -6,6 +6,7 @@ export const firebaseConfig = null;
 export const firebaseConfig = {
     apiKey: "...",
     authDomain: "your-project.firebaseapp.com",
+    databaseURL: "https://your-project-default-rtdb.firebaseio.com",
     projectId: "your-project",
     appId: "..."
 };
