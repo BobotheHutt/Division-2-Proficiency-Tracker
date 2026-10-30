@@ -1,61 +1,48 @@
-/* Fallback style configuration when Tailwind CDN fails to load */
+/* Core styling lives here so the page still looks right if the Tailwind CDN is unreachable. */
+:root { --orange: #ea580c; --orange-light: #fb923c; }
 
-body {
-    background-color: #09090b !important; /* Zinc 950 */
-    color: #f4f4f5 !important;            /* Zinc 100 */
-    font-family: monospace, sans-serif;
-    margin: 0;
-    padding: 0;
-}
+body { background: #09090b; color: #f4f4f5; margin: 0; font-family: ui-monospace, monospace; }
 
-/* Header & Banner Areas */
-header {
-    background-color: #18181b !important; /* Zinc 900 */
-    border-bottom: 2px solid #ea580c !important; /* SHD Orange Line */
+.nav-tab, .sub-tab, .toolbar button {
+    background: #27272a; color: #d4d4d8; border: 1px solid #3f3f46;
+    padding: 6px 12px; border-radius: 4px; cursor: pointer;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
 }
+.sub-tab { color: #a1a1aa; padding: 4px 10px; }
+.nav-tab:hover, .sub-tab:hover, .toolbar button:hover { border-color: var(--orange); }
+.nav-tab.active, .sub-tab.active { background: var(--orange); border-color: #f97316; color: #fff; }
+.tab-count { opacity: .7; font-weight: 400; margin-left: 4px; }
+.toolbar button.danger:hover { border-color: #ef4444; color: #fca5a5; }
 
-h1 {
-    color: #ea580c !important; /* SHD Orange */
-}
+.summary { background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+.bar { height: 6px; background: #27272a; border-radius: 3px; overflow: hidden; }
+.bar > div { height: 100%; width: 0; background: var(--orange); transition: width .2s; }
 
-/* Make text banners clearly readable */
-div, p, span {
-    color: #e4e4e7; /* Zinc 200 light gray */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.toolbar input[type="search"] {
+    flex: 1 1 160px; background: #18181b; border: 1px solid #3f3f46; color: #f4f4f5;
+    padding: 6px 10px; border-radius: 4px; font: inherit; font-size: 13px;
 }
+.toolbar input[type="search"]:focus { outline: none; border-color: var(--orange); }
+.toggle { font-size: 12px; color: #a1a1aa; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.toggle input { accent-color: var(--orange); }
+.hint { font-size: 11px; color: #71717a; margin-bottom: 16px; }
 
-.text-zinc-500, .text-zinc-400 {
-    color: #a1a1aa !important; /* Clear light grey instead of dark fade */
+#items-grid { display: flex; flex-direction: column; gap: 8px; }
+.item-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 10px 12px; background: #18181b; border: 1px solid #27272a; border-radius: 4px; font-size: 12px;
 }
+.item-row.done { border-color: rgba(234, 88, 12, .45); }
+.item-controls { display: flex; align-items: center; gap: 16px; min-width: 190px; }
+.proficient-checkbox { width: 16px; height: 16px; accent-color: var(--orange); cursor: pointer; }
+.rank-wrap { display: flex; flex-direction: column; width: 128px; }
+.rank-label { font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+.rank-label b { color: var(--orange-light); }
+.rank-slider { width: 100%; accent-color: var(--orange); cursor: pointer; }
+.item-info { text-align: right; }
+.item-info h3 { margin: 0; font-size: 14px; font-weight: 700; }
+.item-info span { font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: .1em; }
+.item-row.done h3 { color: var(--orange-light); text-decoration: line-through; text-decoration-color: rgba(234, 88, 12, .3); }
 
-/* Fix Navigation Tab Buttons */
-.nav-tab {
-    background-color: #27272a !important; /* Zinc 800 */
-    color: #d4d4d8 !important;            /* Zinc 300 */
-    border: 1px solid #3f3f46 !important;
-    padding: 8px 16px !important;
-    margin-right: 4px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.nav-tab.active {
-    background-color: #ea580c !important; /* Active Tab Orange */
-    color: #ffffff !important;
-    border-color: #f97316 !important;
-}
-
-/* Sub categories filter row styling buttons */
-#sub-tabs-container button {
-    background-color: #27272a !important;
-    color: #a1a1aa !important;
-    border: 1px solid #3f3f46;
-    padding: 4px 12px !important;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-/* Target Data List Rows Layout */
-#items-grid > div {
-    background-color: #18181b !important;
-    border: 1px solid #27272a !important;
-}
+.empty { text-align: center; padding: 48px 0; color: #71717a; border: 2px dashed #27272a; border-radius: 8px; }

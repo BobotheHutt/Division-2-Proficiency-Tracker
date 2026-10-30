@@ -1,3 +1,25 @@
-export const smgs = [
-    { id: "smg_placeholder", name: "Vector SBR (.45 ACP)", variant: "Standard" }
+export const gloves = [
+    { id: "gloves_5_11_tactical", name: "5.11 Tactical Gloves", variant: "Gloves" },
+    { id: "gloves_airaldi_holdings", name: "Airaldi Holdings Gloves", variant: "Gloves" },
+    { id: "gloves_alps_summit_armaments", name: "Alps Summit Armaments Gloves", variant: "Gloves" },
+    { id: "gloves_badger_tuff", name: "Badger Tuff Gloves", variant: "Gloves" },
+    { id: "gloves_belstone_armory", name: "Belstone Armory Gloves", variant: "Gloves" },
+    { id: "gloves_china_light_industries_corporation", name: "China Light Industries Corporation Gloves", variant: "Gloves" },
+    { id: "gloves_douglas_harding", name: "Douglas & Harding Gloves", variant: "Gloves" },
+    { id: "gloves_empress_international", name: "Empress International Gloves", variant: "Gloves" },
+    { id: "gloves_fenris_group_ab", name: "Fenris Group AB Gloves", variant: "Gloves" },
+    { id: "gloves_gila_guard", name: "Gila Guard Gloves", variant: "Gloves" },
+    { id: "gloves_golan_gear_ltd", name: "Golan Gear Ltd Gloves", variant: "Gloves" },
+    { id: "gloves_grupo_sombra_s_a", name: "Grupo Sombra S.A. Gloves", variant: "Gloves" },
+    { id: "gloves_hana_u_corporation", name: "Hana-U Corporation Gloves", variant: "Gloves" },
+    { id: "gloves_murakami_industries", name: "Murakami Industries Gloves", variant: "Gloves" },
+    { id: "gloves_overlord_armaments", name: "Overlord Armaments Gloves", variant: "Gloves" },
+    { id: "gloves_petrov_defense_group", name: "Petrov Defense Group Gloves", variant: "Gloves" },
+    { id: "gloves_providence_defense", name: "Providence Defense Gloves", variant: "Gloves" },
+    { id: "gloves_richter_kaiser", name: "Richter & Kaiser Gloves", variant: "Gloves" },
+    { id: "gloves_sokolov_concern", name: "Sokolov Concern Gloves", variant: "Gloves" },
+    { id: "gloves_uzina_getica", name: "Uzina Getica Gloves", variant: "Gloves" },
+    { id: "gloves_walker_harris_co", name: "Walker, Harris & Co. Gloves", variant: "Gloves" },
+    { id: "gloves_wyvern_wear", name: "Wyvern Wear Gloves", variant: "Gloves" },
+    { id: "gloves_yaahl_gear", name: "Yaahl Gear Gloves", variant: "Gloves" }
 ];

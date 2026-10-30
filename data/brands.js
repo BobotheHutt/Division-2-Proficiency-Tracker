@@ -1,3 +1,25 @@
-export const smgs = [
-    { id: "smg_placeholder", name: "Vector SBR (.45 ACP)", variant: "Standard" }
+export const brands = [
+    { id: "brand_5_11_tactical", name: "5.11 Tactical", variant: "Brand" },
+    { id: "brand_airaldi_holdings", name: "Airaldi Holdings", variant: "Brand" },
+    { id: "brand_alps_summit_armaments", name: "Alps Summit Armaments", variant: "Brand" },
+    { id: "brand_badger_tuff", name: "Badger Tuff", variant: "Brand" },
+    { id: "brand_belstone_armory", name: "Belstone Armory", variant: "Brand" },
+    { id: "brand_china_light_industries_corporation", name: "China Light Industries Corporation", variant: "Brand" },
+    { id: "brand_douglas_harding", name: "Douglas & Harding", variant: "Brand" },
+    { id: "brand_empress_international", name: "Empress International", variant: "Brand" },
+    { id: "brand_fenris_group_ab", name: "Fenris Group AB", variant: "Brand" },
+    { id: "brand_gila_guard", name: "Gila Guard", variant: "Brand" },
+    { id: "brand_golan_gear_ltd", name: "Golan Gear Ltd", variant: "Brand" },
+    { id: "brand_grupo_sombra_s_a", name: "Grupo Sombra S.A.", variant: "Brand" },
+    { id: "brand_hana_u_corporation", name: "Hana-U Corporation", variant: "Brand" },
+    { id: "brand_murakami_industries", name: "Murakami Industries", variant: "Brand" },
+    { id: "brand_overlord_armaments", name: "Overlord Armaments", variant: "Brand" },
+    { id: "brand_petrov_defense_group", name: "Petrov Defense Group", variant: "Brand" },
+    { id: "brand_providence_defense", name: "Providence Defense", variant: "Brand" },
+    { id: "brand_richter_kaiser", name: "Richter & Kaiser", variant: "Brand" },
+    { id: "brand_sokolov_concern", name: "Sokolov Concern", variant: "Brand" },
+    { id: "brand_uzina_getica", name: "Uzina Getica", variant: "Brand" },
+    { id: "brand_walker_harris_co", name: "Walker, Harris & Co.", variant: "Brand" },
+    { id: "brand_wyvern_wear", name: "Wyvern Wear", variant: "Brand" },
+    { id: "brand_yaahl_gear", name: "Yaahl Gear", variant: "Brand" }
 ];

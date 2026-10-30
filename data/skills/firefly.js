@@ -1,6 +1,6 @@
-export const shield = [
-    { id: "skill_shield_bulwark", name: "Bulwark", variant: "Ballistic Shield" },
-    { id: "skill_shield_crusader", name: "Crusader", variant: "Ballistic Shield" },
-    { id: "skill_shield_deflector", name: "Deflector", variant: "Ballistic Shield" },
-    { id: "skill_shield_striker", name: "Striker (Firewall)", variant: "Ballistic Shield" }
+export const firefly = [
+    { id: "skill_firefly_blinder", name: "Blinder", variant: "Firefly" },
+    { id: "skill_firefly_burster", name: "Burster", variant: "Firefly" },
+    { id: "skill_firefly_demolisher", name: "Demolisher", variant: "Firefly" },
+    { id: "skill_firefly_artificer", name: "Artificer", variant: "Firefly" }
 ];

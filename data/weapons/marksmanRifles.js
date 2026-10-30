@@ -1,3 +1,7 @@
-export const smgs = [
-    { id: "smg_placeholder", name: "Vector SBR (.45 ACP)", variant: "Standard" }
+export const marksmanRifles = [
+    { id: "mr_m700", name: "M700", variant: "Marksman Rifle" },
+    { id: "mr_mk_20_ssr", name: "Mk 20 SSR", variant: "Marksman Rifle" },
+    { id: "mr_dragunov_svd", name: "Dragunov SVD", variant: "Marksman Rifle" },
+    { id: "mr_sr_1", name: "SR-1", variant: "Marksman Rifle" },
+    { id: "mr_srs_a1", name: "SRS A1", variant: "Marksman Rifle" }
 ];
