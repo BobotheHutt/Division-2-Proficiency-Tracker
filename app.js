@@ -74,10 +74,10 @@ const CATEGORIES = {
 
 // Sections on the home page. Categories in the same group appear together as quick-switch buttons in the list view.
 const HUB = [
-    { title: "Weapons", tabs: ["weapons"] },
-    { title: "Named & Exotic Gear", tabs: ["namedExotic"] },
-    { title: "Skills", tabs: ["skills"] },
-    { title: "Brands & Gear Sets", tabs: ["brands", "gearSets"] },
+    { key: "weapons", title: "Weapons", tabs: ["weapons"] },
+    { key: "gear", title: "Named & Exotic Gear", tabs: ["namedExotic"] },
+    { key: "skills", title: "Skills", tabs: ["skills"] },
+    { key: "collections", title: "Brands & Gear Sets", tabs: ["brands", "gearSets"] },
 ];
 const groupOf = tab => HUB.find(g => g.tabs.includes(tab));
 const entriesOf = group => group.tabs.flatMap(tab =>
@@ -167,6 +167,7 @@ function cardHtml(e) {
     } else if (c.total && c.done === c.total) {
         cls = "complete";
     }
+    if (!q && c.done > 0) cls += " started";
     return `<button type="button" class="hub-card ${cls}" data-open="${e.tab}|${e.sub}" data-tone="${toneOf(e.tab)}">
         <span class="hub-id">
             <span class="hub-icon">${glyph(e.tab, e.sub)}</span>
@@ -179,7 +180,7 @@ function cardHtml(e) {
 
 function renderHub() {
     document.getElementById("hub").innerHTML = HUB.map(g => `
-        <section class="hub-section">
+        <section class="hub-section" data-sec="${g.key}">
             <h2>${g.title}</h2>
             <div class="hub-grid">${entriesOf(g).map(cardHtml).join("")}</div>
         </section>`).join("");
@@ -271,6 +272,14 @@ function renderAll() {
     document.getElementById("hub").hidden = !hub;
     document.getElementById("list-view").hidden = hub;
     document.getElementById("list-nav").hidden = hub;
+    // In the list view the whole working area takes the section's color.
+    const sec = hub ? null : groupOf(ui.tab).key;
+    for (const id of ["list-nav", "list-view"]) {
+        const el = document.getElementById(id);
+        if (sec) el.dataset.sec = sec; else el.removeAttribute("data-sec");
+    }
+    const controls = document.querySelector(".controls");
+    if (sec) controls.dataset.sec = sec; else controls.removeAttribute("data-sec");
     renderSummary();
     if (hub) renderHub();
     else { renderListNav(); renderItems(); }

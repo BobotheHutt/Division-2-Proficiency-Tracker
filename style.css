@@ -275,3 +275,65 @@ body.view-hub #reset-btn { display: none; }
 /* Monogram badges for brands and gear sets */
 .monogram { font-weight: 800; font-size: 15px; letter-spacing: .04em; line-height: 1; white-space: nowrap; }
 .compact .monogram { font-size: 12px; }
+
+
+/* ---------- Color: each section gets its own accent ---------- */
+[data-sec="weapons"] { --sec: #f97316; --sec-ink: #1a0a00; --sec-soft: rgba(249, 115, 22, .15); }
+[data-sec="gear"] { --sec: #fbbf24; --sec-ink: #1c1300; --sec-soft: rgba(251, 191, 36, .15); }
+[data-sec="skills"] { --sec: #22d3ee; --sec-ink: #00181d; --sec-soft: rgba(34, 211, 238, .15); }
+[data-sec="collections"] { --sec: #4ade80; --sec-ink: #031a0c; --sec-soft: rgba(74, 222, 128, .15); }
+:root[data-theme="light"] [data-sec="weapons"] { --sec: #ea580c; --sec-ink: #fff; --sec-soft: rgba(234, 88, 12, .10); }
+:root[data-theme="light"] [data-sec="gear"] { --sec: #d97706; --sec-ink: #fff; --sec-soft: rgba(217, 119, 6, .10); }
+:root[data-theme="light"] [data-sec="skills"] { --sec: #0891b2; --sec-ink: #fff; --sec-soft: rgba(8, 145, 178, .10); }
+:root[data-theme="light"] [data-sec="collections"] { --sec: #16a34a; --sec-ink: #fff; --sec-soft: rgba(22, 163, 74, .10); }
+[data-sec] { --accent: var(--sec); --accent-ink: var(--sec-ink); --accent-soft: var(--sec-soft); }
+
+/* Background and header */
+body {
+    background:
+        radial-gradient(900px 420px at 12% -140px, rgba(249, 115, 22, .16), transparent 70%),
+        radial-gradient(800px 380px at 92% -120px, rgba(34, 211, 238, .10), transparent 70%),
+        radial-gradient(700px 500px at 50% 110%, rgba(74, 222, 128, .06), transparent 70%),
+        var(--bg);
+    background-repeat: no-repeat; background-attachment: fixed;
+}
+:root[data-theme="light"] body {
+    background:
+        radial-gradient(900px 420px at 12% -140px, rgba(234, 88, 12, .10), transparent 70%),
+        radial-gradient(800px 380px at 92% -120px, rgba(8, 145, 178, .08), transparent 70%),
+        var(--bg);
+    background-repeat: no-repeat; background-attachment: fixed;
+}
+.site-header { border-image: linear-gradient(90deg, var(--accent), #fbbf24 35%, #22d3ee 70%, #4ade80) 1; border-bottom-width: 2px; }
+.brand-mark { background: linear-gradient(180deg, #fbbf24, var(--accent)); box-shadow: 0 0 14px rgba(249, 115, 22, .55); }
+body.view-hub #summary-bar { background: linear-gradient(90deg, #f97316, #fbbf24, #4ade80); }
+#summary-pct { color: var(--accent); }
+
+/* Home page cards */
+.hub-section h2 { display: flex; align-items: center; gap: 12px; color: var(--accent); font-size: 12px; }
+.hub-section h2::before { content: ""; width: 4px; height: 16px; border-radius: 2px; background: var(--accent); }
+.hub-section h2::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, transparent), transparent); }
+.hub-card {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--surface)), var(--surface) 62%);
+    border-color: color-mix(in srgb, var(--accent) 26%, var(--border));
+    box-shadow: inset 3px 0 0 var(--accent);
+    transition: background .15s, border-color .15s, color .15s, opacity .15s, transform .15s, box-shadow .15s;
+}
+.hub-card:hover, .hub-card:focus-visible {
+    transform: translateY(-2px); background: var(--accent); border-color: var(--accent);
+    box-shadow: 0 10px 26px -8px var(--accent), inset 3px 0 0 var(--accent-ink);
+}
+.hub-icon { color: var(--accent); filter: drop-shadow(0 0 7px color-mix(in srgb, var(--accent) 50%, transparent)); }
+.hub-card:hover .hub-icon, .hub-card:focus-visible .hub-icon { filter: none; }
+.hub-bar { background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); }
+.hub-bar i { background: var(--accent); }
+.hub-card.started .hub-stat b { color: var(--accent); }
+.hub-card.started:hover .hub-stat b { color: var(--accent-ink); }
+.hub-card.complete { box-shadow: inset 3px 0 0 var(--accent), 0 0 18px -4px var(--accent); }
+.hub-card.has-match { box-shadow: inset 3px 0 0 var(--accent), 0 0 16px -4px var(--accent); }
+
+/* List view picks up the section color through --accent; give the nav and rows a little more life */
+#list-nav { border-bottom-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+#list-nav .sub-tab.active { box-shadow: 0 0 18px -6px var(--accent); }
+.item-row:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+.controls[data-sec] { border-bottom-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
