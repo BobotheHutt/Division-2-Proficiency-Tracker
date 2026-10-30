@@ -6,7 +6,6 @@ import { marksmanRifles } from "./data/weapons/marksmanRifles.js";
 import { shotguns } from "./data/weapons/shotguns.js";
 import { pistols } from "./data/weapons/pistols.js";
 import { namedGear } from "./data/namedExotic/namedGear.js";
-import { exoticWeapons } from "./data/namedExotic/exoticWeapons.js";
 import { exoticGear } from "./data/namedExotic/exoticGear.js";
 import { chemLauncher } from "./data/skills/chemLauncher.js";
 import { drone } from "./data/skills/drone.js";
@@ -37,7 +36,6 @@ const CATEGORIES = {
     }},
     namedExotic: { label: "Named & Exotic", subs: {
         namedGear: { label: "Named Gear", items: namedGear },
-        exoticWeapons: { label: "Exotic Weapons", items: exoticWeapons },
         exoticGear: { label: "Exotic Gear", items: exoticGear },
     }},
     skills: { label: "Skills", subs: {
@@ -67,7 +65,7 @@ const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 
 // Color coding, in the spirit of the game: named and brands = gold, exotic = red, gear sets = green.
-const TONES = { namedGear: "named", exoticWeapons: "exotic", exoticGear: "exotic" };
+const TONES = { namedGear: "named", exoticGear: "exotic" };
 const toneOf = (subKey, tab = ui.tab) => TONES[subKey] || (tab === "gearSets" ? "set" : tab === "brands" ? "brand" : "");
 
 // Optional item icons: icons/manifest.json maps item id -> file name. Missing entries show no icon.
@@ -172,7 +170,7 @@ function renderItems() {
     grid.innerHTML = items.map(item => {
         const rank = rankOf(item.id);
         const done = rank >= MAX_RANK;
-        return `<div class="item-row ${done ? "done" : ""} ${item.named ? "named" : ""}" data-id="${esc(item.id)}" data-tone="${tone}">
+        return `<div class="item-row ${done ? "done" : ""} ${item.named ? "named" : ""} ${item.exotic ? "exotic" : ""}" data-id="${esc(item.id)}" data-tone="${tone}">
             <label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>
             ${iconManifest[item.id]
                 ? `<span class="item-icon"><img src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy"></span>`

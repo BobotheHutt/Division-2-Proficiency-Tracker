@@ -1,4 +1,6 @@
 export const lmgs = [
+    { id: "lmg_bullet_king", name: "Bullet King", variant: "LMG", exotic: true },
+    { id: "lmg_ravenous", name: "Ravenous", variant: "LMG", exotic: true },
     { id: "lmg_l86_lsw", name: "L86 LSW", variant: "LMG" },
     { id: "lmg_m249_b", name: "M249 B", variant: "LMG" },
     { id: "lmg_m60_e4", name: "M60 E4", variant: "LMG" },

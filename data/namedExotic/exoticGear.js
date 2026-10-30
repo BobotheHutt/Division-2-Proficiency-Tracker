@@ -1,4 +1,5 @@
 export const exoticGear = [
+    { id: "exg_tardigrade_armor_system", name: "Tardigrade Armor System", variant: "Exotic Gear" },
     { id: "exg_acosta_s_go_bag", name: "Acosta's Go-Bag", variant: "Exotic Gear" },
     { id: "exg_btsu_datagloves", name: "BTSU Datagloves", variant: "Exotic Gear" },
     { id: "exg_ceska_vyroba", name: "Ceska Vyroba", variant: "Exotic Gear" },

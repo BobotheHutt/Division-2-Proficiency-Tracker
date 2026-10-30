@@ -9,6 +9,7 @@
     --accent-ink: #1a0a00;
     --accent-soft: rgba(249, 115, 22, .14);
     --named: #ffbe15;
+    --exotic: #ef4a3a;
     --danger: #f87171;
     --shadow: 0 12px 32px rgba(0, 0, 0, .5);
     color-scheme: dark;
@@ -24,6 +25,7 @@
     --accent-ink: #ffffff;
     --accent-soft: rgba(234, 88, 12, .1);
     --named: #c98a00;
+    --exotic: #d63a2b;
     --danger: #dc2626;
     --shadow: 0 12px 32px rgba(0, 0, 0, .14);
     color-scheme: light;
@@ -195,6 +197,8 @@ button { cursor: pointer; }
 .item-row.done .item-info h3 { color: var(--accent); }
 .item-row.named .item-info h3, .item-row.named.done .item-info h3 { color: var(--named); }
 .item-row.named .item-icon { color: var(--named); }
+.item-row.exotic .item-info h3, .item-row.exotic.done .item-info h3 { color: var(--exotic); }
+.item-row.exotic .item-icon { color: var(--exotic); }
 
 .rank-wrap { display: flex; align-items: center; gap: 12px; width: 210px; flex: none; }
 .rank-value { width: 44px; text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); }

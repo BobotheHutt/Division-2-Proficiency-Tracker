@@ -1,4 +1,5 @@
 export const assaultRifles = [
+    { id: "ar_eagle_bearer", name: "Eagle Bearer", variant: "Assault Rifle", exotic: true },
     { id: "ar_acr", name: "ACR", variant: "Assault Rifle" },
     { id: "ar_acr_e", name: "ACR-E", variant: "Assault Rifle" },
     { id: "ar_ak_m", name: "AK-M", variant: "Assault Rifle" },

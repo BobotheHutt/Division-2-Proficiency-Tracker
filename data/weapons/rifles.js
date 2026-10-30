@@ -1,4 +1,7 @@
 export const rifles = [
+    { id: "rifle_bighorn", name: "Bighorn", variant: "Rifle", exotic: true },
+    { id: "rifle_merciless", name: "Merciless", variant: "Rifle", exotic: true },
+    { id: "rifle_regulator", name: "Regulator", variant: "Rifle", exotic: true },
     { id: "rifle_1886_classic", name: "1886", variant: "Rifle" },
     { id: "rifle_classic_m1a", name: "Classic M1A", variant: "Rifle" },
     { id: "rifle_m44", name: "M44", variant: "Rifle" },

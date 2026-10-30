@@ -1,4 +1,5 @@
 export const pistols = [
+    { id: "pistol_liberty", name: "Liberty", variant: "Pistol", exotic: true },
     { id: "pistol_d50", name: "D50", variant: "Pistol" },
     { id: "pistol_m1911", name: "M1911", variant: "Pistol" },
     { id: "pistol_m9a3", name: "M9A3", variant: "Pistol" },
