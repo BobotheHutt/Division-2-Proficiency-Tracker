@@ -5,12 +5,6 @@ import { rifles } from "./data/weapons/rifles.js";
 import { marksmanRifles } from "./data/weapons/marksmanRifles.js";
 import { shotguns } from "./data/weapons/shotguns.js";
 import { pistols } from "./data/weapons/pistols.js";
-import { masks } from "./data/armor/masks.js";
-import { chests } from "./data/armor/chests.js";
-import { backpacks } from "./data/armor/backpacks.js";
-import { gloves } from "./data/armor/gloves.js";
-import { holsters } from "./data/armor/holsters.js";
-import { kneepads } from "./data/armor/kneepads.js";
 import { namedWeapons } from "./data/namedExotic/namedWeapons.js";
 import { namedGear } from "./data/namedExotic/namedGear.js";
 import { exoticWeapons } from "./data/namedExotic/exoticWeapons.js";
@@ -38,14 +32,6 @@ const CATEGORIES = {
         marksmanRifles: { label: "Marksman Rifles", items: marksmanRifles },
         shotguns: { label: "Shotguns", items: shotguns },
         pistols: { label: "Pistols", items: pistols },
-    }},
-    armor: { label: "Armor", subs: {
-        masks: { label: "Masks", items: masks },
-        chests: { label: "Chests", items: chests },
-        backpacks: { label: "Backpacks", items: backpacks },
-        gloves: { label: "Gloves", items: gloves },
-        holsters: { label: "Holsters", items: holsters },
-        kneepads: { label: "Kneepads", items: kneepads },
     }},
     namedExotic: { label: "Named & Exotic", subs: {
         namedWeapons: { label: "Named Weapons", items: namedWeapons },
