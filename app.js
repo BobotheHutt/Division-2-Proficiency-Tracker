@@ -68,7 +68,7 @@ let userProgress = load(STORAGE_KEY, {});
 const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 
-// Color coding, in the spirit of the game: named = gold, exotic = red, gear sets = green, brands = blue.
+// Color coding, in the spirit of the game: named and brands = gold, exotic = red, gear sets = green.
 const TONES = { namedWeapons: "named", namedGear: "named", exoticWeapons: "exotic", exoticGear: "exotic" };
 const toneOf = (subKey, tab = ui.tab) => TONES[subKey] || (tab === "gearSets" ? "set" : tab === "brands" ? "brand" : "");
 
