@@ -33,6 +33,7 @@ const LINE = {
     namedGear: `<path d="M10 3l3 2h6l3-2 5 4-3 4v11H8V11L5 7z"/>`,
     exoticGear: `<path d="M10 3l3 2h6l3-2 5 4-3 4v11H8V11L5 7z"/>`,
     brands: `<path d="M6 12V6a1 1 0 0 1 1-1h6.5L26 17.5 18.5 25 6 12z" transform="translate(0 -1.5)"/><circle cx="10.5" cy="8.5" r="1.4"/>`,
+    namedExotic: `<polygon points="${star(16, 12.5, 10, 4.4)}"/>`,
     gearSets: `<polygon points="16,3 28,9 16,15 4,9"/><path d="M4 13l12 6 12-6M4 17l12 6 12-6"/>`,
 };
 
@@ -42,3 +43,6 @@ export function glyph(tab, subKey) {
     if (LINE[key]) return `<svg class="glyph" viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${LINE[key]}</svg>`;
     return "";
 }
+
+const TAB_ICON = { weapons: "assaultRifles", namedExotic: "namedExotic", skills: "drone", brands: "brands", gearSets: "gearSets" };
+export const tabGlyph = tab => glyph(tab, TAB_ICON[tab]) || glyph("", TAB_ICON[tab]);

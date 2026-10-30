@@ -93,14 +93,23 @@ button { cursor: pointer; }
 /* Tabs */
 .tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
-.main-nav .tabs { gap: 2px; }
+.main-nav .tabs { gap: 8px; padding-top: 4px; padding-bottom: 14px; }
 .nav-tab {
-    position: relative; background: transparent; border: 0; padding: 12px 14px; font-size: 14px; font-weight: 600;
-    color: var(--muted); white-space: nowrap; transition: color .15s;
+    display: flex; align-items: center; gap: 10px; flex: 1 1 0; min-width: 148px; max-width: 220px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 14px; text-align: left; color: var(--muted); transition: border-color .15s, background .15s, color .15s;
 }
-.nav-tab:hover { color: var(--text); }
-.nav-tab.active { color: var(--text); }
-.nav-tab.active::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); }
+.nav-tab:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); color: var(--text); }
+.nav-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+.nav-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 8px; background: var(--surface); color: var(--muted); }
+.nav-icon .glyph { width: 24px; height: 18px; }
+.nav-tab.active .nav-icon { background: var(--accent); color: var(--accent-ink); }
+.nav-text { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+.nav-label { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-progress { display: flex; align-items: center; gap: 8px; }
+.nav-bar { flex: 1; height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }
+.nav-bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+.nav-count { font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); }
 .subbar { border-bottom: 1px solid var(--border); background: var(--bg); }
 .subbar .tabs { padding-top: 12px; padding-bottom: 12px; gap: 6px; }
 .subbar .tabs:empty { padding: 0; }
@@ -196,6 +205,8 @@ button { cursor: pointer; }
 .about p { font-size: 12px; line-height: 1.5; }
 
 @media (max-width: 640px) {
+    .site-header { position: static; }
+    .nav-tab { min-width: 140px; }
     .container { padding: 0 14px; }
     .brand h1 { font-size: 15px; }
     .sync-status { display: none; }

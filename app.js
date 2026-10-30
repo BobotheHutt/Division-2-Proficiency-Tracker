@@ -19,7 +19,7 @@ import { turret } from "./data/skills/turret.js";
 import { brands } from "./data/brands.js";
 import { gearSets } from "./data/gearSets.js";
 
-import { glyph } from "./icons.js";
+import { glyph, tabGlyph } from "./icons.js";
 import { cloudEnabled, initCloud, signIn, signOut, loadProgress, saveProgress } from "./cloud.js";
 
 const MAX_RANK = 10;
@@ -116,8 +116,14 @@ function renderTabs() {
     nav.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) => {
         const all = Object.values(cat.subs).flatMap(s => s.items);
         const { done, total } = count(all);
-        return `<button class="nav-tab ${key === ui.tab ? "active" : ""}" data-tab="${key}">${cat.label}
-            <span class="tab-count">${done}/${total}</span></button>`;
+        const pct = total ? Math.round((done / total) * 100) : 0;
+        return `<button class="nav-tab ${key === ui.tab ? "active" : ""}" data-tab="${key}">
+            <span class="nav-icon">${tabGlyph(key)}</span>
+            <span class="nav-text">
+                <span class="nav-label">${cat.label}</span>
+                <span class="nav-progress"><span class="nav-bar"><i style="width:${pct}%"></i></span><span class="nav-count">${done}/${total}</span></span>
+            </span>
+        </button>`;
     }).join("");
 }
 
