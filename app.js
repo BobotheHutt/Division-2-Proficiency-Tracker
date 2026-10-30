@@ -64,7 +64,7 @@ function save(key, value) {
 
 // userProgress: { [itemId]: rank }
 let userProgress = load(STORAGE_KEY, {});
-const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false }, load(UI_KEY, {}));
+const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 
 const rankOf = id => userProgress[id] || 0;
@@ -149,16 +149,14 @@ function renderItems() {
         const rank = rankOf(item.id);
         const done = rank >= MAX_RANK;
         return `<div class="item-row ${done ? "done" : ""}" data-id="${esc(item.id)}">
-            <div class="item-controls">
-                <input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}">
-                <div class="rank-wrap">
-                    <span class="rank-label">Rank <b>${rank}</b>/${MAX_RANK}</span>
-                    <input type="range" class="rank-slider" min="0" max="${MAX_RANK}" value="${rank}" aria-label="Rank: ${esc(item.name)}">
-                </div>
-            </div>
+            <label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>
             <div class="item-info">
                 <h3>${esc(item.name)}</h3>
                 <span>${esc(item.variant || "")}</span>
+            </div>
+            <div class="rank-wrap">
+                <input type="range" class="rank-slider" min="0" max="${MAX_RANK}" value="${rank}" style="--pct:${rank * 10}%" aria-label="Rank: ${esc(item.name)}">
+                <span class="rank-value"><b>${rank}</b>/${MAX_RANK}</span>
             </div>
         </div>`;
     }).join("");
@@ -176,8 +174,10 @@ function refreshRow(row) {
     const id = row.dataset.id;
     const rank = rankOf(id);
     row.classList.toggle("done", rank >= MAX_RANK);
-    row.querySelector(".rank-label b").textContent = rank;
-    row.querySelector(".rank-slider").value = rank;
+    row.querySelector(".rank-value b").textContent = rank;
+    const slider = row.querySelector(".rank-slider");
+    slider.value = rank;
+    slider.style.setProperty("--pct", `${rank * 10}%`);
     row.querySelector(".proficient-checkbox").checked = rank >= MAX_RANK;
     renderTabs();
     renderSubTabs();
@@ -259,13 +259,65 @@ document.getElementById("reset-btn").addEventListener("click", () => {
 
 renderAll();
 
+// --- Settings panel ---
+const settingsBtn = document.getElementById("settings-btn");
+const settingsPanel = document.getElementById("settings-panel");
+
+function setPanel(open) {
+    settingsPanel.hidden = !open;
+    settingsBtn.setAttribute("aria-expanded", String(open));
+}
+settingsBtn.addEventListener("click", () => setPanel(settingsPanel.hidden));
+document.addEventListener("click", e => {
+    if (!settingsPanel.hidden && !e.target.closest(".settings")) setPanel(false);
+});
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !settingsPanel.hidden) { setPanel(false); settingsBtn.focus(); }
+});
+
+const systemLight = matchMedia("(prefers-color-scheme: light)");
+function applyTheme() {
+    const t = ui.theme;
+    document.documentElement.dataset.theme = t === "system" ? (systemLight.matches ? "light" : "dark") : t;
+    document.querySelectorAll("[data-theme-choice]").forEach(b => b.classList.toggle("active", b.dataset.themeChoice === t));
+}
+document.getElementById("theme-options").addEventListener("click", e => {
+    const b = e.target.closest("[data-theme-choice]");
+    if (!b) return;
+    ui.theme = b.dataset.themeChoice;
+    save(UI_KEY, ui);
+    applyTheme();
+});
+systemLight.addEventListener("change", () => { if (ui.theme === "system") applyTheme(); });
+
+const compactToggle = document.getElementById("compact-toggle");
+function applyCompact() {
+    document.body.classList.toggle("compact", ui.compact);
+    compactToggle.checked = ui.compact;
+}
+compactToggle.addEventListener("change", () => { ui.compact = compactToggle.checked; save(UI_KEY, ui); applyCompact(); });
+
+applyTheme();
+applyCompact();
+
 // --- Accounts (optional; the tracker works locally without signing in) ---
-const authBtn = document.getElementById("auth-btn");
+const authButtons = document.querySelectorAll("[data-auth]");
+const cloudParts = document.querySelectorAll(".needs-cloud");
+const headerSignIn = document.getElementById("header-signin");
+const accountInfo = document.getElementById("account-info");
+
+function renderAuth() {
+    const signedIn = !!currentUser;
+    authButtons.forEach(b => { b.textContent = signedIn ? "Log out" : (b === headerSignIn ? "Sign in" : "Sign in with Google"); b.disabled = false; });
+    headerSignIn.hidden = signedIn;
+    accountInfo.textContent = signedIn
+        ? `Signed in as ${currentUser.displayName || currentUser.email}. Progress syncs across devices.`
+        : "Not signed in. Progress is saved in this browser only.";
+}
 
 async function onUserChange(user) {
     currentUser = user;
-    authBtn.textContent = user ? "Sign out" : "Sign in with Google";
-    authBtn.disabled = false;
+    renderAuth();
     if (!user) { setSyncStatus(""); return; }
     setSyncStatus("Syncing...");
     try {
@@ -276,7 +328,7 @@ async function onUserChange(user) {
         userProgress = merged;
         save(STORAGE_KEY, userProgress);
         await saveProgress(user.uid, userProgress);
-        setSyncStatus(`Synced as ${user.displayName || user.email}`);
+        setSyncStatus("Synced");
         renderAll();
     } catch (err) {
         console.error(err);
@@ -285,11 +337,12 @@ async function onUserChange(user) {
 }
 
 if (cloudEnabled) {
-    document.getElementById("account").hidden = false;
-    authBtn.addEventListener("click", async () => {
-        authBtn.disabled = true;
+    cloudParts.forEach(el => { el.hidden = false; });
+    authButtons.forEach(b => b.addEventListener("click", async () => {
+        authButtons.forEach(x => { x.disabled = true; });
         try { await (currentUser ? signOut() : signIn()); }
-        catch (err) { console.error(err); authBtn.disabled = false; }
-    });
-    initCloud(onUserChange).then(ok => { if (!ok) document.getElementById("account").hidden = true; });
+        catch (err) { console.error(err); }
+        authButtons.forEach(x => { x.disabled = false; });
+    }));
+    initCloud(onUserChange).then(ok => { if (!ok) cloudParts.forEach(el => { el.hidden = true; }); });
 }

@@ -1,22 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Division 2 Proficiency Tracker</title>
+    <script>
+        // Apply the saved theme before first paint to avoid a flash.
+        try {
+            const t = (JSON.parse(localStorage.getItem("d2-proficiency-ui")) || {}).theme || "dark";
+            document.documentElement.dataset.theme = t === "system"
+                ? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark") : t;
+        } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header class="site-header">
         <div class="container header-inner">
-            <h1>Division 2 Proficiency Tracker</h1>
-            <nav class="tabs" id="main-tabs"></nav>
-            <div id="account" hidden>
-                <span id="sync-status"></span>
-                <button id="auth-btn" type="button" class="nav-tab">Sign in with Google</button>
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <h1>Division 2 Proficiency Tracker</h1>
+            </div>
+            <div class="header-actions">
+                <span id="sync-status" class="sync-status"></span>
+                <button type="button" class="btn primary needs-cloud" data-auth id="header-signin" hidden>Sign in</button>
+                <div class="settings">
+                    <button type="button" class="icon-btn" id="settings-btn" aria-label="Settings" aria-expanded="false" aria-controls="settings-panel">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+                    </button>
+                    <div class="panel" id="settings-panel" hidden>
+                        <section class="needs-cloud" hidden id="account-section">
+                            <h2>Account</h2>
+                            <p id="account-info" class="muted">Not signed in. Progress is saved in this browser only.</p>
+                            <button type="button" class="btn full" data-auth id="panel-auth">Sign in with Google</button>
+                        </section>
+                        <section>
+                            <h2>Appearance</h2>
+                            <div class="segmented" id="theme-options" role="group" aria-label="Theme">
+                                <button type="button" data-theme-choice="dark">Dark</button>
+                                <button type="button" data-theme-choice="light">Light</button>
+                                <button type="button" data-theme-choice="system">System</button>
+                            </div>
+                            <label class="switch-row">
+                                <span>Compact rows</span>
+                                <input type="checkbox" id="compact-toggle">
+                            </label>
+                        </section>
+                        <section>
+                            <h2>Data</h2>
+                            <div class="btn-row">
+                                <button type="button" class="btn" id="export-btn">Export</button>
+                                <button type="button" class="btn" id="import-btn">Import</button>
+                            </div>
+                            <button type="button" class="btn danger full" id="reset-btn">Reset current tab</button>
+                            <input id="import-input" type="file" accept="application/json,.json" hidden>
+                        </section>
+                        <section>
+                            <h2>More</h2>
+                            <p class="muted">More settings coming soon.</p>
+                        </section>
+                    </div>
+                </div>
             </div>
         </div>
+        <nav class="main-nav" aria-label="Categories">
+            <div class="container tabs" id="main-tabs"></div>
+        </nav>
     </header>
 
     <div class="subbar">
@@ -33,17 +83,15 @@
         </div>
 
         <div class="toolbar">
-            <input id="search" type="search" placeholder="Search..." autocomplete="off">
-            <label class="toggle"><input type="checkbox" id="hide-done"> Hide completed</label>
-            <button id="export-btn" type="button">Export</button>
-            <button id="import-btn" type="button">Import</button>
-            <button id="reset-btn" type="button" class="danger">Reset tab</button>
-            <input id="import-input" type="file" accept="application/json,.json" hidden>
+            <div class="search-wrap">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input id="search" type="search" placeholder="Search this category" autocomplete="off">
+            </div>
+            <label class="chip-toggle"><input type="checkbox" id="hide-done"><span>Hide completed</span></label>
         </div>
 
-        <p class="hint">Progress saves automatically in this browser, or to your account when signed in. Set rank to <b>10</b> (or tick the box) to mark an item proficient.</p>
-
         <div id="items-grid"></div>
+        <p class="hint">Set a rank to <b>10</b>, or tick the box, to mark an item proficient.</p>
     </main>
 
     <script type="module" src="app.js"></script>
