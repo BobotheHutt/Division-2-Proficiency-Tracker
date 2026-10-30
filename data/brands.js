@@ -19,7 +19,7 @@ export const brands = [
     { id: "brand_providence_defense", name: "Providence Defense", variant: "Brand" },
     { id: "brand_urban_lookout", name: "Urban Lookout", variant: "Brand" },
     { id: "brand_overlord_armaments", name: "Overlord Armaments", variant: "Brand" },
-    { id: "brand_imminence_armament", name: "Imminence Armament", variant: "Brand" },
+    { id: "brand_imminence_armament", name: "Imminence Armaments", variant: "Brand" },
     { id: "brand_china_light_industries_corporation", name: "China Light Industries Corporation", variant: "Brand" },
     { id: "brand_shiny_monkey_gear", name: "Shiny Monkey Gear", variant: "Brand" },
     { id: "brand_yaahl_gear", name: "Yaahl Gear", variant: "Brand" },

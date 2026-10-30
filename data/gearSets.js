@@ -1,6 +1,6 @@
 export const gearSets = [
     { id: "set_core_strength", name: "Core Strength", variant: "Gear Set" },
-    { id: "set_concentrated_composite", name: "Concentrated Composite", variant: "Gear Set" },
+    { id: "set_concentrated_company", name: "Concentrated Company", variant: "Gear Set" },
     { id: "set_tipping_scales", name: "Tipping Scales", variant: "Gear Set" },
     { id: "set_measured_assembly", name: "Measured Assembly", variant: "Gear Set" },
     { id: "set_refactor", name: "Refactor", variant: "Gear Set" },
