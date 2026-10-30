@@ -1,7 +1,7 @@
 function renderItems() {
     const grid = document.getElementById("items-grid");
     
-    // Change layout from a multi-column grid to a single vertical stack
+    // Kept in a single vertical stack
     grid.className = "max-w-2xl mx-auto space-y-2"; 
     grid.innerHTML = "";
     
@@ -16,12 +16,12 @@ function renderItems() {
         return;
     }
 
-    // Clone and sort the current subset array alphabetically by item name
+    // Sort items alphabetically
     const sortedItems = [...currentItems].sort((a, b) => a.name.localeCompare(b.name));
     
     sortedItems.forEach(item => {
         if (!userProgress[item.id]) {
-            userProgress[item.id] = { rank: 0, grade: 0 };
+            userProgress[item.id] = { rank: 0 };
         }
         const state = userProgress[item.id];
         const isProficient = state.rank >= 10;
@@ -33,25 +33,17 @@ function renderItems() {
         
         row.innerHTML = `
             <!-- Left Side: Interactive Controls Group -->
-            <div class="flex items-center space-x-4 min-w-[240px]">
-                <!-- Checkbox (Auto marks or forces max rank) -->
+            <div class="flex items-center space-x-4 min-w-[180px]">
+                <!-- Checkbox -->
                 <input type="checkbox" ${isProficient ? 'checked' : ''} 
                     class="proficient-checkbox w-4 h-4 rounded border-zinc-700 text-orange-500 focus:ring-orange-500 focus:ring-offset-zinc-900 bg-zinc-950 accent-orange-500 cursor-pointer"
                     data-id="${item.id}">
                 
-                <!-- Rank Slider -->
+                <!-- Rank Slider Only -->
                 <div class="flex flex-col w-32">
                     <span class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Rank: <b class="text-orange-400 min-w-[14px] inline-block text-right">${state.rank}</b>/10</span>
                     <input type="range" min="0" max="10" value="${state.rank}" 
                         class="rank-slider w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-orange-500"
-                        data-id="${item.id}">
-                </div>
-
-                <!-- Grade Field (0-30) -->
-                <div class="flex flex-col">
-                    <span class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Grade</span>
-                    <input type="number" min="0" max="30" value="${state.grade}" 
-                        class="grade-input w-10 bg-zinc-950 text-center font-bold border border-zinc-800 rounded py-0.5 text-zinc-300 focus:outline-none focus:border-orange-500"
                         data-id="${item.id}">
                 </div>
             </div>
@@ -63,23 +55,16 @@ function renderItems() {
             </div>
         `;
         
-        // --- CONTROL INTERACTIONS AND EVENT HOOKS ---
-        
         // 1. Slider Movement Logic
         row.querySelector('.rank-slider').addEventListener('input', (e) => {
             const currentVal = parseInt(e.target.value) || 0;
             updateItemState(e.target.dataset.id, 'rank', currentVal);
         });
 
-        // 2. Checkbox Click Logic (Forces to 10 if checked, drops to 0 if unchecked)
+        // 2. Checkbox Click Logic
         row.querySelector('.proficient-checkbox').addEventListener('change', (e) => {
             const targetRank = e.target.checked ? 10 : 0;
             updateItemState(e.target.dataset.id, 'rank', targetRank);
-        });
-
-        // 3. Grade Numeric Field Input
-        row.querySelector('.grade-input').addEventListener('input', (e) => {
-            updateItemState(e.target.dataset.id, 'grade', e.target.value);
         });
 
         grid.appendChild(row);
