@@ -30,7 +30,7 @@ export const rifles = [
     { id: "rifle_achilles", name: "Achilles", variant: "Rifle", named: true },
     { id: "rifle_resolute_mk47", name: "Resolute Mk47", variant: "Rifle" },
     { id: "rifle_harmony", name: "Harmony", variant: "Rifle", named: true },
-    { id: "rifle_1886_0", name: "1886.0", variant: "Rifle" },
+    { id: "rifle_1886_0", name: "1886", variant: "Rifle" },
     { id: "rifle_the_virginian", name: "The Virginian", variant: "Rifle", named: true },
     { id: "rifle_diamondback", name: "Diamondback", variant: "Rifle", exotic: true }
 ];

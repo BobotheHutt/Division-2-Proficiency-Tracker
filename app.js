@@ -343,6 +343,12 @@ grid.addEventListener("change", e => {
     if (ui.hideDone) renderItems();
 });
 
+// Mouse wheel scrolls the category row sideways when it overflows (phones/narrow windows).
+document.getElementById("sub-tabs-container").addEventListener("wheel", e => {
+    const el = e.currentTarget;
+    if (el.scrollWidth > el.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX)) { el.scrollLeft += e.deltaY; e.preventDefault(); }
+}, { passive: false });
+
 const searchBox = document.getElementById("search");
 searchBox.value = ui.search;
 
