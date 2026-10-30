@@ -201,10 +201,7 @@ function pillProgress(items) {
 function renderListNav() {
     const active = activeSubKey();
     document.getElementById("sub-tabs-container").innerHTML =
-        `<button type="button" class="back-btn" data-back>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
-            All categories
-        </button>` +
+        "" +
         entriesOf(groupOf(ui.tab)).map(e => {
             const p = pillProgress(e.items);
             const on = e.tab === ui.tab && e.sub === active;
@@ -272,6 +269,7 @@ function renderAll() {
     document.getElementById("hub").hidden = !hub;
     document.getElementById("list-view").hidden = hub;
     document.getElementById("list-nav").hidden = hub;
+    document.getElementById("back-btn").hidden = hub;
     // In the list view the whole working area takes the section's color.
     const sec = hub ? null : groupOf(ui.tab).key;
     for (const id of ["list-nav", "list-view"]) {
@@ -342,12 +340,6 @@ grid.addEventListener("change", e => {
     refreshRow(row);
     if (ui.hideDone) renderItems();
 });
-
-// Mouse wheel scrolls the category row sideways when it overflows (phones/narrow windows).
-document.getElementById("sub-tabs-container").addEventListener("wheel", e => {
-    const el = e.currentTarget;
-    if (el.scrollWidth > el.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX)) { el.scrollLeft += e.deltaY; e.preventDefault(); }
-}, { passive: false });
 
 const searchBox = document.getElementById("search");
 searchBox.value = ui.search;

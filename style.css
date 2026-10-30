@@ -338,9 +338,12 @@ body.view-hub #summary-bar { background: linear-gradient(90deg, #e8a317, #ff6600
 .item-row:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
 .controls[data-sec] { border-bottom-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
 
-/* Category buttons wrap on wide screens (no hidden scrolling); phones scroll sideways */
-@media (min-width: 641px) {
-    .subbar .tabs { flex-wrap: wrap; overflow: visible; }
-    .sub-tab { min-width: 0; padding: 5px 11px; }
-    #list-nav .tabs { padding-top: 8px; padding-bottom: 8px; gap: 6px; }
-}
+
+/* Category switcher in the list view: small three-column cards like the home page (scrolls with the list) */
+.subnav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+#sub-tabs-container .sub-tab { min-width: 0; width: 100%; padding: 8px 10px; }
+#sub-tabs-container .sub-tab .nav-label { white-space: normal; overflow: visible; line-height: 1.15; font-size: 12.5px; }
+.summary-text { gap: 10px; }
+#summary-label { flex: 1; }
+.summary-text .back-btn { padding: 0 10px; height: 28px; font-size: 12px; gap: 4px; }
+@media (max-width: 640px) { .subnav { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
