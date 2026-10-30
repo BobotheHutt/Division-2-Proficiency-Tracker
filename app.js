@@ -19,6 +19,7 @@ import { turret } from "./data/skills/turret.js";
 import { brands } from "./data/brands.js";
 import { gearSets } from "./data/gearSets.js";
 
+import { glyph } from "./icons.js";
 import { cloudEnabled, initCloud, signIn, signOut, loadProgress, saveProgress } from "./cloud.js";
 
 const MAX_RANK = 10;
@@ -157,12 +158,15 @@ function renderItems() {
     }
 
     const tone = toneOf(activeSubKey());
+    const icon = glyph(ui.tab, activeSubKey());
     grid.innerHTML = items.map(item => {
         const rank = rankOf(item.id);
         const done = rank >= MAX_RANK;
         return `<div class="item-row ${done ? "done" : ""}" data-id="${esc(item.id)}" data-tone="${tone}">
             <label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>
-            ${iconManifest[item.id] ? `<img class="item-icon" src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy">` : ""}
+            ${iconManifest[item.id]
+                ? `<span class="item-icon"><img src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy"></span>`
+                : `<span class="item-icon">${icon}</span>`}
             <div class="item-info">
                 <h3>${esc(item.name)}</h3>
                 <span>${esc(item.variant || "")}</span>
