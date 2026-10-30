@@ -9,5 +9,6 @@ export const masks = [
     { id: "exg_coyote_s_mask", name: "Coyote's Mask", variant: "Mask", exotic: true },
     { id: "exg_catalyst", name: "Catalyst", variant: "Mask", exotic: true },
     { id: "exg_tinkerer", name: "Tinkerer", variant: "Mask", exotic: true },
-    { id: "exg_investor", name: "Investor", variant: "Mask", exotic: true }
+    { id: "exg_investor", name: "Investor", variant: "Mask", exotic: true },
+    { id: "improvised_mask", name: "Improvised Mask", variant: "Mask", improvised: true }
 ];

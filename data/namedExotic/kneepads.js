@@ -9,5 +9,6 @@ export const kneepads = [
     { id: "exg_acosta_kneepads", name: "Acosta Kneepads", variant: "Kneepads", exotic: true },
     { id: "exg_blacklisters", name: "Blacklisters", variant: "Kneepads", exotic: true },
     { id: "exg_nurse_s_kneepads", name: "Nurse's Kneepads", variant: "Kneepads", exotic: true },
-    { id: "exg_ninjabike_messenger_kneepads", name: "NinjaBike Messenger Kneepads", variant: "Kneepads", exotic: true }
+    { id: "exg_ninjabike_messenger_kneepads", name: "NinjaBike Messenger Kneepads", variant: "Kneepads", exotic: true },
+    { id: "improvised_kneepads", name: "Improvised Kneepads", variant: "Kneepads", improvised: true }
 ];

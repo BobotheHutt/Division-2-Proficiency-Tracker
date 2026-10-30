@@ -8,5 +8,6 @@ export const gloves = [
     { id: "exg_btsu_datagloves", name: "BTSU Datagloves", variant: "Gloves", exotic: true },
     { id: "exg_exodus_gloves", name: "Exodus Gloves", variant: "Gloves", exotic: true },
     { id: "exg_overdogs", name: "Overdogs", variant: "Gloves", exotic: true },
-    { id: "exg_rugged_gauntlets", name: "Rugged Gauntlets", variant: "Gloves", exotic: true }
+    { id: "exg_rugged_gauntlets", name: "Rugged Gauntlets", variant: "Gloves", exotic: true },
+    { id: "improvised_gloves", name: "Improvised Gloves", variant: "Gloves", improvised: true }
 ];

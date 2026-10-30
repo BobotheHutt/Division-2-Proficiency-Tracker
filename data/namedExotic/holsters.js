@@ -10,5 +10,6 @@ export const holsters = [
     { id: "exg_imperial_dynasty", name: "Imperial Dynasty", variant: "Holster", exotic: true },
     { id: "exg_shocker_punch", name: "Shocker Punch", variant: "Holster", exotic: true },
     { id: "exg_waveform", name: "Waveform", variant: "Holster", exotic: true },
-    { id: "exg_nimble_holster", name: "Nimble Holster", variant: "Holster", exotic: true }
+    { id: "exg_nimble_holster", name: "Nimble Holster", variant: "Holster", exotic: true },
+    { id: "improvised_holster", name: "Improvised Holster", variant: "Holster", improvised: true }
 ];

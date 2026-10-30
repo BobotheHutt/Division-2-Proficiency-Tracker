@@ -25,5 +25,6 @@ export const bodyArmor = [
     { id: "exg_provocator", name: "Provocator", variant: "Body Armor", exotic: true },
     { id: "exg_beacon", name: "Beacon", variant: "Body Armor", exotic: true },
     { id: "exg_tardigrade_armor_system", name: "Tardigrade Armor System", variant: "Body Armor", exotic: true },
-    { id: "exg_ridgeway_s_pride", name: "Ridgeway's Pride", variant: "Body Armor", exotic: true }
+    { id: "exg_ridgeway_s_pride", name: "Ridgeway's Pride", variant: "Body Armor", exotic: true },
+    { id: "improvised_body_armor", name: "Improvised Body Armor", variant: "Body Armor", improvised: true }
 ];

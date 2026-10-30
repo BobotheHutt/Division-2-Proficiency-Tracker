@@ -24,5 +24,6 @@ export const backpacks = [
     { id: "exg_birdie_s_quick_fix_pack", name: "Birdie's Quick Fix Pack", variant: "Backpack", exotic: true },
     { id: "exg_memento", name: "Memento", variant: "Backpack", exotic: true },
     { id: "exg_ninjabike_messenger_backpack", name: "NinjaBike Messenger Backpack", variant: "Backpack", exotic: true },
-    { id: "exg_harrier_pride", name: "Harrier Pride", variant: "Backpack", exotic: true }
+    { id: "exg_harrier_pride", name: "Harrier Pride", variant: "Backpack", exotic: true },
+    { id: "improvised_backpack", name: "Improvised Backpack", variant: "Backpack", improvised: true }
 ];
