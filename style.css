@@ -1,16 +1,61 @@
-/* Custom UI tweaks to match the SHD terminal aesthetics */
+/* Fallback style configuration when Tailwind CDN fails to load */
+
 body {
-    background-image: radial-gradient(circle at top center, #1c1917 0%, #09090b 100%);
+    background-color: #09090b !important; /* Zinc 950 */
+    color: #f4f4f5 !important;            /* Zinc 100 */
+    font-family: monospace, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+/* Header & Banner Areas */
+header {
+    background-color: #18181b !important; /* Zinc 900 */
+    border-bottom: 2px solid #ea580c !important; /* SHD Orange Line */
 }
-::-webkit-scrollbar-track {
-    background: #09090b;
+
+h1 {
+    color: #ea580c !important; /* SHD Orange */
 }
-::-webkit-scrollbar-thumb {
-    background: #ea580c;
-    border-radius: 3px;
+
+/* Make text banners clearly readable */
+div, p, span {
+    color: #e4e4e7; /* Zinc 200 light gray */
+}
+
+.text-zinc-500, .text-zinc-400 {
+    color: #a1a1aa !important; /* Clear light grey instead of dark fade */
+}
+
+/* Fix Navigation Tab Buttons */
+.nav-tab {
+    background-color: #27272a !important; /* Zinc 800 */
+    color: #d4d4d8 !important;            /* Zinc 300 */
+    border: 1px solid #3f3f46 !important;
+    padding: 8px 16px !important;
+    margin-right: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.nav-tab.active {
+    background-color: #ea580c !important; /* Active Tab Orange */
+    color: #ffffff !important;
+    border-color: #f97316 !important;
+}
+
+/* Sub categories filter row styling buttons */
+#sub-tabs-container button {
+    background-color: #27272a !important;
+    color: #a1a1aa !important;
+    border: 1px solid #3f3f46;
+    padding: 4px 12px !important;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Target Data List Rows Layout */
+#items-grid > div {
+    background-color: #18181b !important;
+    border: 1px solid #27272a !important;
 }
