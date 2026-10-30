@@ -108,6 +108,15 @@ fetch("icons/manifest.json")
     .then(m => { iconManifest = m && typeof m === "object" ? m : {}; if (Object.keys(iconManifest).length) renderItems(); })
     .catch(() => {});
 
+// Original monogram badge (initials) used for brands and gear sets.
+const SKIP = new Set(["of", "the", "de", "co", "ltd", "ab", "gmbh", "sa", "spa", "sp", "z", "o", "s", "r", "l"]);
+function monogram(name) {
+    const words = name.replace(/[&.,:()']/g, " ").split(/\s+/).filter(Boolean);
+    if (/\d/.test(words[0])) return name.split(/\s+/)[0];
+    const sig = words.filter(w => !SKIP.has(w.toLowerCase()));
+    return (sig.length ? sig : words).slice(0, 2).map(w => w[0].toUpperCase()).join("");
+}
+
 const rankOf = id => userProgress[id] || 0;
 const isDone = id => rankOf(id) >= MAX_RANK;
 const activeSubKey = () => {
@@ -236,6 +245,7 @@ function renderItems() {
 
     const tone = toneOf(ui.tab);
     const icon = glyph(ui.tab, activeSubKey());
+    const isCollection = ui.tab === "brands" || ui.tab === "gearSets";
     grid.innerHTML = items.map(item => {
         const rank = rankOf(item.id);
         const done = rank >= MAX_RANK;
@@ -243,7 +253,7 @@ function renderItems() {
             <label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>
             ${iconManifest[item.id]
                 ? `<span class="item-icon"><img src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy"></span>`
-                : `<span class="item-icon">${icon}</span>`}
+                : `<span class="item-icon">${isCollection ? `<span class="monogram">${esc(monogram(item.name))}</span>` : icon}</span>`}
             <div class="item-info">
                 <h3>${esc(item.name)}</h3>
             </div>

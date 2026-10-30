@@ -44,14 +44,7 @@ const LINE = {
     shield: `<rect x="9" y="2.500" width="14" height="19" rx="3.500"/><rect x="11.800" y="6" width="8.400" height="3.500" rx="1"/><path d="M12 13.500h8M12 16.500h8"/>`,
 };
 
-// Weapon class icons are images in icons/class/. They're used as masks so they take the surrounding text color
-// (light/dark theme, orange hover, named/exotic tint) like the drawn glyphs do.
-const CLASS_IMG = new Set(["rifles", "assaultRifles", "marksmanRifles", "shotguns", "smgs", "lmgs", "pistols", "specialization"]);
-
 export function glyph(tab, subKey) {
-    if (tab === "weapons" && CLASS_IMG.has(subKey)) {
-        return `<span class="glyph glyph-mask" style="--src:url('icons/class/${subKey}.png')" aria-hidden="true"></span>`;
-    }
     const key = tab === "brands" || tab === "gearSets" ? tab : subKey;
     if (FILL[key]) return `<svg class="glyph" viewBox="0 0 32 24" fill="currentColor" aria-hidden="true">${FILL[key]}</svg>`;
     if (LINE[key]) return `<svg class="glyph" viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${LINE[key]}</svg>`;
