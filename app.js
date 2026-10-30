@@ -82,6 +82,10 @@ const activeSubKey = () => {
     return subs[ui.subs[ui.tab]] ? ui.subs[ui.tab] : Object.keys(subs)[0];
 };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const query = () => ui.search.trim().toLowerCase();
+const matches = (item, q = query()) => !q || item.name.toLowerCase().includes(q);
+const visible = item => matches(item) && (!ui.hideDone || !isDone(item.id));
+const countVisible = items => items.filter(visible).length;
 const count = items => ({ done: items.filter(i => isDone(i.id)).length, total: items.length });
 
 let currentUser = null;
@@ -107,17 +111,27 @@ function setRank(id, rank) {
     persist();
 }
 
+// Progress bar + count normally; a match count while searching (tabs without hits are dimmed).
+function tabProgress(items) {
+    if (query()) {
+        const n = countVisible(items);
+        return { cls: n ? "has-match" : "no-match",
+                 html: `<span class="nav-match">${n ? `${n} ${n === 1 ? "match" : "matches"}` : "No matches"}</span>` };
+    }
+    const { done, total } = count(items);
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    return { cls: "", html: `<span class="nav-bar"><i style="width:${pct}%"></i></span><span class="nav-count">${done}/${total}</span>` };
+}
+
 function renderTabs() {
     const nav = document.getElementById("main-tabs");
     nav.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) => {
-        const all = Object.values(cat.subs).flatMap(s => s.items);
-        const { done, total } = count(all);
-        const pct = total ? Math.round((done / total) * 100) : 0;
-        return `<button class="nav-tab ${key === ui.tab ? "active" : ""}" data-tab="${key}">
+        const p = tabProgress(Object.values(cat.subs).flatMap(s => s.items));
+        return `<button class="nav-tab ${key === ui.tab ? "active" : ""} ${p.cls}" data-tab="${key}">
             <span class="nav-icon">${tabGlyph(key)}</span>
             <span class="nav-text">
                 <span class="nav-label">${cat.label}</span>
-                <span class="nav-progress"><span class="nav-bar"><i style="width:${pct}%"></i></span><span class="nav-count">${done}/${total}</span></span>
+                <span class="nav-progress">${p.html}</span>
             </span>
         </button>`;
     }).join("");
@@ -129,13 +143,12 @@ function renderSubTabs() {
     if (Object.keys(subs).length < 2) { container.innerHTML = ""; return; }
     const active = activeSubKey();
     container.innerHTML = Object.entries(subs).map(([key, sub]) => {
-        const { done, total } = count(sub.items);
-        const pct = total ? Math.round((done / total) * 100) : 0;
-        return `<button class="sub-tab ${key === active ? "active" : ""}" data-sub="${key}" data-tone="${toneOf(key)}">
+        const p = tabProgress(sub.items);
+        return `<button class="sub-tab ${key === active ? "active" : ""} ${p.cls}" data-sub="${key}" data-tone="${toneOf(key)}">
             <span class="nav-icon">${glyph(ui.tab, key)}</span>
             <span class="nav-text">
                 <span class="nav-label">${sub.label}</span>
-                <span class="nav-progress"><span class="nav-bar"><i style="width:${pct}%"></i></span><span class="nav-count">${done}/${total}</span></span>
+                <span class="nav-progress">${p.html}</span>
             </span>
         </button>`;
     }).join("");
@@ -145,7 +158,9 @@ function renderSummary() {
     const sub = CATEGORIES[ui.tab].subs[activeSubKey()];
     const { done, total } = count(sub.items);
     const pct = total ? Math.round((done / total) * 100) : 0;
-    document.getElementById("summary-label").textContent = `${sub.label}: ${done}/${total} proficient`;
+    document.getElementById("summary-label").textContent = query()
+        ? `${sub.label}: ${countVisible(sub.items)} of ${total} match "${ui.search.trim()}"`
+        : `${sub.label}: ${done}/${total} proficient`;
     document.getElementById("summary-pct").textContent = `${pct}%`;
     document.getElementById("summary-bar").style.width = `${pct}%`;
 }
@@ -153,15 +168,13 @@ function renderSummary() {
 function renderItems() {
     const grid = document.getElementById("items-grid");
     const sub = CATEGORIES[ui.tab].subs[activeSubKey()];
-    const q = ui.search.trim().toLowerCase();
-
-    const items = [...sub.items]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .filter(i => !q || i.name.toLowerCase().includes(q))
-        .filter(i => !ui.hideDone || !isDone(i.id));
+    const items = sub.items.filter(visible).sort((a, b) => a.name.localeCompare(b.name));
 
     if (!items.length) {
-        grid.innerHTML = `<div class="empty">${q || ui.hideDone ? "Nothing matches the current filters." : "No items in this category yet."}</div>`;
+        const elsewhere = countVisible(Object.values(CATEGORIES).flatMap(c => Object.values(c.subs).flatMap(s => s.items)));
+        grid.innerHTML = `<div class="empty">${query() || ui.hideDone
+            ? `Nothing here matches.${elsewhere ? ` ${elsewhere} ${elsewhere === 1 ? "match is" : "matches are"} in the highlighted tabs.` : ""}`
+            : "No items in this category yet."}</div>`;
         return;
     }
 
@@ -236,11 +249,34 @@ grid.addEventListener("change", e => {
 
 const searchBox = document.getElementById("search");
 searchBox.value = ui.search;
-searchBox.addEventListener("input", () => { ui.search = searchBox.value; save(UI_KEY, ui); renderItems(); });
+
+// If the current category has no hits, jump to the first one that does (current tab's categories first).
+function jumpToFirstMatch() {
+    if (!query() || countVisible(CATEGORIES[ui.tab].subs[activeSubKey()].items)) return;
+    const tabs = [ui.tab, ...Object.keys(CATEGORIES).filter(k => k !== ui.tab)];
+    for (const tab of tabs) {
+        for (const [subKey, sub] of Object.entries(CATEGORIES[tab].subs)) {
+            if (countVisible(sub.items)) { ui.tab = tab; ui.subs[tab] = subKey; return; }
+        }
+    }
+}
+searchBox.addEventListener("input", () => {
+    ui.search = searchBox.value;
+    jumpToFirstMatch();
+    save(UI_KEY, ui);
+    renderAll();
+});
+// "/" focuses search from anywhere; Esc clears it.
+document.addEventListener("keydown", e => {
+    if (e.key === "/" && !e.target.closest("input, textarea")) { e.preventDefault(); searchBox.focus(); }
+    else if (e.key === "Escape" && e.target === searchBox && searchBox.value) {
+        searchBox.value = ""; ui.search = ""; save(UI_KEY, ui); renderAll();
+    }
+});
 
 const hideBox = document.getElementById("hide-done");
 hideBox.checked = ui.hideDone;
-hideBox.addEventListener("change", () => { ui.hideDone = hideBox.checked; save(UI_KEY, ui); renderItems(); });
+hideBox.addEventListener("change", () => { ui.hideDone = hideBox.checked; save(UI_KEY, ui); renderAll(); });
 
 document.getElementById("export-btn").addEventListener("click", () => {
     const blob = new Blob([JSON.stringify(userProgress, null, 2)], { type: "application/json" });

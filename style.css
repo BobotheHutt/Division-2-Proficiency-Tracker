@@ -114,6 +114,10 @@ button { cursor: pointer; }
 .nav-progress { display: flex; align-items: center; gap: 8px; }
 .nav-bar { flex: 1; height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }
 .nav-bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+.nav-match { font-size: 11px; font-weight: 700; color: var(--muted); }
+.nav-tab.has-match, .sub-tab.has-match { border-color: var(--accent); }
+.nav-tab.has-match .nav-match, .sub-tab.has-match .nav-match { color: var(--accent); }
+.nav-tab.no-match, .sub-tab.no-match { opacity: .4; }
 .nav-count { font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); }
 .subbar { border-bottom: 1px solid var(--border); background: var(--bg); }
 .subbar .tabs { padding-top: 12px; padding-bottom: 12px; gap: 8px; }
