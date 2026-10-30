@@ -1,0 +1,16 @@
+/* Custom UI tweaks to match the SHD terminal aesthetics */
+body {
+    background-image: radial-gradient(circle at top center, #1c1917 0%, #09090b 100%);
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #09090b;
+}
+::-webkit-scrollbar-thumb {
+    background: #ea580c;
+    border-radius: 3px;
+}
