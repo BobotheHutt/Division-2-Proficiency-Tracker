@@ -23,6 +23,7 @@ export const gearSets = [
     { id: "set_ortiz_reficere", name: "Ortiz: Reficere", variant: "Gear Set" },
     { id: "set_aces_eights", name: "Aces & Eights", variant: "Gear Set" },
     { id: "set_tip_of_the_spear", name: "Tip of the Spear", variant: "Gear Set" },
+    { id: "set_ongoing_directive", name: "Ongoing Directive", variant: "Gear Set" },
     { id: "set_negotiator_s_dilemma", name: "Negotiator's Dilemma", variant: "Gear Set" },
     { id: "set_hard_wired", name: "Hard Wired", variant: "Gear Set" },
     { id: "set_true_patriot", name: "True Patriot", variant: "Gear Set" }
