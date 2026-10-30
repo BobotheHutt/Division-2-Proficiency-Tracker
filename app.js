@@ -67,6 +67,10 @@ let userProgress = load(STORAGE_KEY, {});
 const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 
+// Color coding, in the spirit of the game: named = gold, exotic = red, gear sets = green, brands = blue.
+const TONES = { namedWeapons: "named", namedGear: "named", exoticWeapons: "exotic", exoticGear: "exotic" };
+const toneOf = (subKey, tab = ui.tab) => TONES[subKey] || (tab === "gearSets" ? "set" : tab === "brands" ? "brand" : "");
+
 const rankOf = id => userProgress[id] || 0;
 const isDone = id => rankOf(id) >= MAX_RANK;
 const activeSubKey = () => {
@@ -116,7 +120,7 @@ function renderSubTabs() {
     const active = activeSubKey();
     container.innerHTML = Object.entries(subs).map(([key, sub]) => {
         const { done, total } = count(sub.items);
-        return `<button class="sub-tab ${key === active ? "active" : ""}" data-sub="${key}">${sub.label}
+        return `<button class="sub-tab ${key === active ? "active" : ""}" data-sub="${key}" data-tone="${toneOf(key)}">${sub.label}
             <span class="tab-count">${done}/${total}</span></button>`;
     }).join("");
 }
@@ -145,10 +149,11 @@ function renderItems() {
         return;
     }
 
+    const tone = toneOf(activeSubKey());
     grid.innerHTML = items.map(item => {
         const rank = rankOf(item.id);
         const done = rank >= MAX_RANK;
-        return `<div class="item-row ${done ? "done" : ""}" data-id="${esc(item.id)}">
+        return `<div class="item-row ${done ? "done" : ""}" data-id="${esc(item.id)}" data-tone="${tone}">
             <label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>
             <div class="item-info">
                 <h3>${esc(item.name)}</h3>
