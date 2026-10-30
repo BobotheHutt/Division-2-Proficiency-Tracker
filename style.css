@@ -289,16 +289,19 @@ body.view-hub #reset-btn { display: none; }
 /* Background and header */
 body {
     background:
-        radial-gradient(900px 420px at 12% -140px, rgba(249, 115, 22, .16), transparent 70%),
-        radial-gradient(800px 380px at 92% -120px, rgba(255, 215, 0, .09), transparent 70%),
-        radial-gradient(700px 500px at 50% 110%, rgba(74, 222, 128, .06), transparent 70%),
+        radial-gradient(900px 640px at 4% 18%, rgba(255, 102, 0, .30), transparent 65%),
+        radial-gradient(900px 620px at 98% 36%, rgba(255, 215, 0, .20), transparent 65%),
+        radial-gradient(1000px 700px at 14% 104%, rgba(74, 222, 128, .20), transparent 65%),
+        radial-gradient(800px 560px at 88% 100%, rgba(232, 163, 23, .18), transparent 65%),
         var(--bg);
     background-repeat: no-repeat; background-attachment: fixed;
 }
 :root[data-theme="light"] body {
     background:
-        radial-gradient(900px 420px at 12% -140px, rgba(234, 88, 12, .10), transparent 70%),
-        radial-gradient(800px 380px at 92% -120px, rgba(202, 138, 4, .08), transparent 70%),
+        radial-gradient(900px 640px at 4% 18%, rgba(230, 92, 0, .22), transparent 65%),
+        radial-gradient(900px 620px at 98% 36%, rgba(202, 138, 4, .18), transparent 65%),
+        radial-gradient(1000px 700px at 14% 104%, rgba(22, 163, 74, .16), transparent 65%),
+        radial-gradient(800px 560px at 88% 100%, rgba(184, 134, 11, .15), transparent 65%),
         var(--bg);
     background-repeat: no-repeat; background-attachment: fixed;
 }
