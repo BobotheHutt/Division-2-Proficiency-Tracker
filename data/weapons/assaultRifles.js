@@ -13,7 +13,7 @@ export const assaultRifles = [
     { id: "ar_the_drill", name: "The Drill", variant: "Assault Rifle", named: true },
     { id: "ar_f2000", name: "F2000", variant: "Assault Rifle" },
     { id: "ar_shield_splinterer", name: "Shield Splinterer", variant: "Assault Rifle", named: true },
-    { id: "ar_agitator", name: "Agitator", variant: "Assault Rifle", named: true },
+    { id: "ar_agitator", name: "Agitator", variant: "Assault Rifle", exotic: true },
     { id: "ar_fal", name: "FAL", variant: "Assault Rifle" },
     { id: "ar_fal_sa", name: "FAL SA-58", variant: "Assault Rifle" },
     { id: "ar_fal_sa_58_para", name: "FAL SA-58 Para", variant: "Assault Rifle" },
@@ -45,12 +45,14 @@ export const assaultRifles = [
     { id: "ar_test_subject", name: "Test Subject", variant: "Assault Rifle", named: true },
     { id: "ar_first_bloom", name: "First Bloom", variant: "Assault Rifle", named: true },
     { id: "ar_capacitor", name: "Capacitor", variant: "Assault Rifle", exotic: true },
-    { id: "ar_sig_sauer_556", name: "Sig Sauer 556", variant: "Assault Rifle" },
+    { id: "ar_sig_sauer_556", name: "SIG 556", variant: "Assault Rifle" },
     { id: "ar_mechanical_animal", name: "Mechanical Animal", variant: "Assault Rifle", named: true },
     { id: "ar_tkb_408", name: "TKB-408", variant: "Assault Rifle" },
     { id: "ar_kingbreaker", name: "Kingbreaker", variant: "Assault Rifle", named: true },
     { id: "ar_ctar21", name: "CTAR-21", variant: "Assault Rifle" },
     { id: "ar_the_railsplitter", name: "The Railsplitter", variant: "Assault Rifle", named: true },
     { id: "ar_chameleon", name: "Chameleon", variant: "Assault Rifle", exotic: true },
-    { id: "ar_the_archivist", name: "The Archivist", variant: "Assault Rifle", named: true }
+    { id: "ar_the_archivist", name: "The Archivist", variant: "Assault Rifle", named: true },
+    { id: "rifle_merciless", name: "Merciless", variant: "Assault Rifle", exotic: true },
+    { id: "ar_caduceus", name: "Caduceus", variant: "Assault Rifle", exotic: true }
 ];

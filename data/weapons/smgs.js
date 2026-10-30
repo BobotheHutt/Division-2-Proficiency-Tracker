@@ -24,7 +24,7 @@ export const smgs = [
     { id: "smg_ouroboros", name: "Ouroboros", variant: "SMG", exotic: true },
     { id: "smg_mp7", name: "MP7", variant: "SMG" },
     { id: "smg_swap_chain", name: "Swap Chain", variant: "SMG", named: true },
-    { id: "smg_oxpecker", name: "Oxpecker", variant: "SMG", named: true },
+    { id: "smg_oxpecker", name: "Oxpecker", variant: "SMG", exotic: true },
     { id: "smg_police_t821", name: "Police T821", variant: "SMG" },
     { id: "smg_black_market_t821", name: "Black Market T821", variant: "SMG" },
     { id: "smg_police_ump_45", name: "Police UMP-45", variant: "SMG" },
@@ -37,8 +37,10 @@ export const smgs = [
     { id: "smg_p90", name: "P90", variant: "SMG" },
     { id: "smg_emeline_s_guard", name: "Emeline's Guard", variant: "SMG", named: true },
     { id: "smg_chatterbox", name: "The Chatterbox", variant: "SMG", exotic: true },
-    { id: "smg_mpx", name: "MPX", variant: "SMG" },
+    { id: "smg_mpx", name: "SIG MPX", variant: "SMG" },
     { id: "smg_safety_distance", name: "Safety Distance", variant: "SMG", named: true },
     { id: "smg_the_apartment", name: "The Apartment", variant: "SMG", named: true },
-    { id: "smg_backfire", name: "Backfire", variant: "SMG", exotic: true }
+    { id: "smg_backfire", name: "Backfire", variant: "SMG", exotic: true },
+    { id: "smg_old_glory", name: "Old Glory", variant: "SMG", named: true },
+    { id: "smg_underboss", name: "Underboss", variant: "SMG", exotic: true }
 ];

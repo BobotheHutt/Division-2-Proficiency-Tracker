@@ -248,7 +248,9 @@ function renderSummary() {
 function renderItems() {
     const grid = document.getElementById("items-grid");
     const sub = CATEGORIES[ui.tab].subs[activeSubKey()];
-    const items = sub.items.filter(visible).sort((a, b) => a.name.localeCompare(b.name));
+    // Plain character order (digits first, accented letters after z) to match the in-game list.
+    const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
+    const items = sub.items.filter(visible).sort(byName);
 
     if (!items.length) {
         const elsewhere = countVisible(allItems());

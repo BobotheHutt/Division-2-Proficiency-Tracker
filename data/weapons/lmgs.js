@@ -5,7 +5,7 @@ export const lmgs = [
     { id: "lmg_military_l86_lsw", name: "Military L86 LSW", variant: "LMG" },
     { id: "lmg_custom_l86_a2", name: "Custom L86 A2", variant: "LMG" },
     { id: "lmg_tabula_rasa", name: "Tabula Rasa", variant: "LMG", named: true },
-    { id: "lmg_hk_gr9", name: "HK GR9", variant: "LMG" },
+    { id: "lmg_hk_gr9", name: "GR9", variant: "LMG" },
     { id: "lmg_dare", name: "Dare", variant: "LMG", named: true },
     { id: "lmg_cricket", name: "Cricket", variant: "LMG", named: true },
     { id: "lmg_m249_b", name: "M249 B", variant: "LMG" },
@@ -34,6 +34,8 @@ export const lmgs = [
     { id: "lmg_black_market_rpk_74", name: "Black Market RPK-74", variant: "LMG" },
     { id: "lmg_rusty", name: "Rusty", variant: "LMG", named: true },
     { id: "lmg_new_reliable", name: "New Reliable", variant: "LMG", named: true },
-    { id: "lmg_pakhan", name: "Pakhan", variant: "LMG", named: true },
-    { id: "lmg_big_alejandro", name: "Big Alejandro", variant: "LMG", named: true }
+    { id: "lmg_pakhan", name: "Pakhan", variant: "LMG", exotic: true },
+    { id: "lmg_big_alejandro", name: "Big Alejandro", variant: "LMG", exotic: true },
+    { id: "lmg_insult_to_injury", name: "Insult to Injury", variant: "LMG", named: true },
+    { id: "lmg_vertigo", name: "Vertigo", variant: "LMG", exotic: true }
 ];

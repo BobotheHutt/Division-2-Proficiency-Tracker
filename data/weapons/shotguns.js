@@ -1,12 +1,11 @@
 export const shotguns = [
     { id: "sg_acs_12", name: "ACS-12", variant: "Shotgun" },
-    { id: "sg_stack_broker", name: "Stack Broker", variant: "Shotgun" },
+    { id: "sg_stack_broker", name: "Stack Broker", variant: "Shotgun", named: true },
     { id: "sg_lefty", name: "Lefty", variant: "Shotgun", named: true },
     { id: "sg_rock_n_roll", name: "Rock n' Roll", variant: "Shotgun", named: true },
     { id: "sg_double_barrel_shotgun", name: "Double Barrel Shotgun", variant: "Shotgun" },
     { id: "sg_boomstick", name: "Boomstick", variant: "Shotgun", named: true },
-    { id: "sg_sawed_off_double_barrel", name: "Sawed-Off Double Barrel", variant: "Shotgun" },
-    { id: "sg_firestarter", name: "Firestarter", variant: "Shotgun", named: true },
+    { id: "sg_sawed_off_double_barrel", name: "Double Barrel Sawed Off", variant: "Shotgun" },
     { id: "sg_backup_boomstick", name: "Backup Boomstick", variant: "Shotgun", named: true },
     { id: "sg_ksg_shotgun", name: "KSG Shotgun", variant: "Shotgun" },
     { id: "sg_the_send_off", name: "The Send-Off", variant: "Shotgun", named: true },
@@ -28,9 +27,10 @@ export const shotguns = [
     { id: "sg_super_90", name: "Super 90", variant: "Shotgun" },
     { id: "sg_tactical_super_90_sbs", name: "Tactical Super 90 SBS", variant: "Shotgun" },
     { id: "sg_like_glue", name: "Like Glue", variant: "Shotgun", named: true },
-    { id: "sg_the_sheriff", name: "The Sheriff", variant: "Shotgun", named: true },
+    { id: "sg_the_sheriff", name: "Sheriff", variant: "Shotgun", exotic: true },
     { id: "sg_enforcer", name: "Enforcer", variant: "Shotgun", named: true },
     { id: "sg_six12", name: "Six12", variant: "Shotgun" },
     { id: "sg_the_mop", name: "The Mop", variant: "Shotgun", named: true },
-    { id: "sg_scorpio", name: "Scorpio", variant: "Shotgun", exotic: true }
+    { id: "sg_scorpio", name: "Scorpio", variant: "Shotgun", exotic: true },
+    { id: "sg_fafnir", name: "Fafnir", variant: "Shotgun", exotic: true }
 ];

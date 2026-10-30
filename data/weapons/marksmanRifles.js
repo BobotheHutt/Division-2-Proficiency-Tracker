@@ -9,7 +9,7 @@ export const marksmanRifles = [
     { id: "mr_model_700", name: "Model 700", variant: "Marksman Rifle" },
     { id: "mr_brutus", name: "Brutus", variant: "Marksman Rifle", named: true },
     { id: "mr_ekim_s_long_stick", name: "Ekim's Long Stick", variant: "Marksman Rifle", named: true },
-    { id: "mr_shroud", name: "Shroud", variant: "Marksman Rifle", named: true },
+    { id: "mr_shroud", name: "Shroud", variant: "Marksman Rifle", exotic: true },
     { id: "mr_paratrooper_svd", name: "Paratrooper SVD", variant: "Marksman Rifle" },
     { id: "mr_surplus_svd", name: "Surplus SVD", variant: "Marksman Rifle" },
     { id: "mr_commando", name: "Commando", variant: "Marksman Rifle", named: true },
@@ -26,9 +26,12 @@ export const marksmanRifles = [
     { id: "mr_oh_carol", name: "Oh Carol", variant: "Marksman Rifle", named: true },
     { id: "mr_the_white_death", name: "The White Death", variant: "Marksman Rifle", named: true },
     { id: "mr_sr_1", name: "SR-1", variant: "Marksman Rifle" },
-    { id: "mr_adrestia", name: "Adrestia", variant: "Marksman Rifle" },
+    { id: "mr_adrestia", name: "Adrestia", variant: "Marksman Rifle", named: true },
     { id: "mr_designated_hitter", name: "Designated Hitter", variant: "Marksman Rifle", named: true },
     { id: "mr_tactical_308", name: "Tactical .308", variant: "Marksman Rifle" },
     { id: "mr_scalpel", name: "Scalpel", variant: "Marksman Rifle", named: true },
-    { id: "mr_nemesis", name: "Nemesis", variant: "Marksman Rifle", exotic: true }
+    { id: "mr_nemesis", name: "Nemesis", variant: "Marksman Rifle", exotic: true },
+    { id: "mr_steamer", name: "Steamer", variant: "Marksman Rifle", named: true },
+    { id: "mr_incendia", name: "Incendia", variant: "Marksman Rifle", named: true },
+    { id: "mr_prima_donna", name: "Prima Donna", variant: "Marksman Rifle", exotic: true }
 ];

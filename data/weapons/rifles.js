@@ -2,7 +2,6 @@ export const rifles = [
     { id: "rifle_acr_ss", name: "ACR SS", variant: "Rifle" },
     { id: "rifle_trader", name: "Trader", variant: "Rifle", named: true },
     { id: "rifle_ruthless", name: "Ruthless", variant: "Rifle", exotic: true },
-    { id: "rifle_merciless", name: "Merciless", variant: "Rifle", exotic: true },
     { id: "rifle_uic15_mod2", name: "UIC15 MOD2", variant: "Rifle" },
     { id: "rifle_m16a2", name: "M16A2", variant: "Rifle" },
     { id: "rifle_whisper", name: "Whisper", variant: "Rifle", named: true },
@@ -18,7 +17,7 @@ export const rifles = [
     { id: "rifle_lvoa_c", name: "LVOA-C", variant: "Rifle" },
     { id: "rifle_surge", name: "Surge", variant: "Rifle", named: true },
     { id: "rifle_urban_mdr", name: "Urban MDR", variant: "Rifle" },
-    { id: "rifle_vindicator", name: "Vindicator", variant: "Rifle", named: true },
+    { id: "rifle_vindicator", name: "Vindicator", variant: "Rifle", exotic: true },
     { id: "rifle_military_mk17", name: "Military MK17", variant: "Rifle" },
     { id: "rifle_police_mk17", name: "Police MK17", variant: "Rifle" },
     { id: "rifle_everlasting_gaze", name: "Everlasting Gaze", variant: "Rifle", named: true },
@@ -32,5 +31,10 @@ export const rifles = [
     { id: "rifle_harmony", name: "Harmony", variant: "Rifle", named: true },
     { id: "rifle_1886_0", name: "1886", variant: "Rifle" },
     { id: "rifle_the_virginian", name: "The Virginian", variant: "Rifle", named: true },
-    { id: "rifle_diamondback", name: "Diamondback", variant: "Rifle", exotic: true }
+    { id: "rifle_diamondback", name: "Diamondback", variant: "Rifle", exotic: true },
+    { id: "rifle_brain_break", name: "Brain Break", variant: "Rifle", named: true },
+    { id: "rifle_lichtenberg", name: "Lichtenberg", variant: "Rifle", named: true },
+    { id: "rifle_teapot", name: "Teapot", variant: "Rifle", named: true },
+    { id: "rifle_the_claw", name: "The Claw", variant: "Rifle", named: true },
+    { id: "rifle_steel_sons_acr", name: "Steel & Sons ACR", variant: "Rifle", exotic: true }
 ];
