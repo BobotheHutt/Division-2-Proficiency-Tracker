@@ -5,6 +5,7 @@ import { rifles } from "./data/weapons/rifles.js";
 import { marksmanRifles } from "./data/weapons/marksmanRifles.js";
 import { shotguns } from "./data/weapons/shotguns.js";
 import { pistols } from "./data/weapons/pistols.js";
+import { specialization } from "./data/weapons/specialization.js";
 import { masks } from "./data/namedExotic/masks.js";
 import { bodyArmor } from "./data/namedExotic/bodyArmor.js";
 import { backpacks } from "./data/namedExotic/backpacks.js";
@@ -43,6 +44,7 @@ const CATEGORIES = {
         smgs: { label: "SMGs", items: smgs },
         lmgs: { label: "LMGs", items: lmgs },
         pistols: { label: "Pistols", items: pistols },
+        specialization: { label: "Specialization", items: specialization },
     }},
     namedExotic: { label: "Named & Exotic Gear", subs: {
         masks: { label: "Masks", items: masks },
