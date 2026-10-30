@@ -1,9 +1,25 @@
-/* Core styling lives here so the page still looks right if the Tailwind CDN is unreachable. */
+/* All site styling lives here. */
 :root { --orange: #ea580c; --orange-light: #fb923c; }
 
-body { background: #09090b; color: #f4f4f5; margin: 0; font-family: ui-monospace, monospace; }
-
+* { box-sizing: border-box; }
+body { background: #09090b; color: #f4f4f5; margin: 0; min-height: 100vh; font-family: ui-monospace, monospace; }
 [hidden] { display: none !important; }
+
+.container { max-width: 80rem; margin: 0 auto; padding: 0 16px; }
+.container.narrow { max-width: 42rem; padding-top: 24px; padding-bottom: 24px; }
+.site-header { position: sticky; top: 0; z-index: 50; background: #18181b; border-bottom: 1px solid rgba(234, 88, 12, .3); box-shadow: 0 10px 25px rgba(0,0,0,.4); }
+.header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+.site-header h1 { margin: 0; color: var(--orange); font-size: 20px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; }
+.subbar { background: rgba(24, 24, 27, .6); border-bottom: 1px solid #27272a; }
+.subbar .tabs { padding-top: 12px; padding-bottom: 12px; gap: 8px; }
+.subbar .tabs:empty { padding: 0; }
+#account { display: flex; align-items: center; gap: 8px; }
+#sync-status { font-size: 12px; color: #a1a1aa; }
+.summary-text { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+#summary-label { color: var(--orange); font-weight: 700; }
+#summary-pct { color: #a1a1aa; }
+
 .nav-tab, .sub-tab, .toolbar button {
     background: #27272a; color: #d4d4d8; border: 1px solid #3f3f46;
     padding: 6px 12px; border-radius: 4px; cursor: pointer;

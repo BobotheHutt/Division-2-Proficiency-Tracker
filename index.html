@@ -4,31 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Division 2 Proficiency Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen">
+<body>
 
-    <header class="bg-zinc-900 border-b border-orange-600/30 sticky top-0 z-50 shadow-xl">
-        <div class="max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
-            <h1 class="text-orange-500 font-black tracking-widest text-xl uppercase">SHD // Proficiency Log</h1>
-            <nav class="flex flex-wrap gap-1" id="main-tabs"></nav>
-            <div id="account" class="flex items-center gap-2" hidden>
-                <span id="sync-status" class="text-xs text-zinc-400 font-mono"></span>
+    <header class="site-header">
+        <div class="container header-inner">
+            <h1>Division 2 Proficiency Tracker</h1>
+            <nav class="tabs" id="main-tabs"></nav>
+            <div id="account" hidden>
+                <span id="sync-status"></span>
                 <button id="auth-btn" type="button" class="nav-tab">Sign in with Google</button>
             </div>
         </div>
     </header>
 
-    <div class="bg-zinc-900/60 border-b border-zinc-800 py-3">
-        <div class="max-w-7xl mx-auto px-4 flex flex-wrap gap-2" id="sub-tabs-container"></div>
+    <div class="subbar">
+        <div class="container tabs" id="sub-tabs-container"></div>
     </div>
 
-    <main class="max-w-2xl mx-auto px-4 py-6">
+    <main class="container narrow">
         <div class="summary">
-            <div class="flex justify-between font-mono text-sm mb-2">
-                <span id="summary-label" class="text-orange-500 font-bold"></span>
-                <span id="summary-pct" class="text-zinc-400"></span>
+            <div class="summary-text">
+                <span id="summary-label"></span>
+                <span id="summary-pct"></span>
             </div>
             <div class="bar"><div id="summary-bar"></div></div>
         </div>
@@ -42,7 +41,7 @@
             <input id="import-input" type="file" accept="application/json,.json" hidden>
         </div>
 
-        <p class="hint">Progress saves automatically in this browser. Set rank to <b>10</b> (or tick the box) to mark an item proficient. Use Export to back it up.</p>
+        <p class="hint">Progress saves automatically in this browser, or to your account when signed in. Set rank to <b>10</b> (or tick the box) to mark an item proficient.</p>
 
         <div id="items-grid"></div>
     </main>
