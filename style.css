@@ -147,10 +147,10 @@ button { cursor: pointer; }
 .chip-toggle input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* Color coding */
-[data-tone="named"] { --tone: #ffbe15; }
+[data-tone="named"] { --tone: var(--accent); }
 [data-tone="exotic"] { --tone: #ef4a3a; }
 [data-tone="set"] { --tone: #3fb871; }
-[data-tone="brand"] { --tone: #ffbe15; }
+[data-tone="brand"] { --tone: var(--accent); }
 .item-row[data-tone]:not([data-tone=""]) { border-left: 4px solid var(--tone); }
 .item-row[data-tone]:not([data-tone=""]) .item-info span { color: var(--tone); }
 .sub-tab[data-tone]:not([data-tone=""])::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--tone); }
