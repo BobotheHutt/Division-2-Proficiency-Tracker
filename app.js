@@ -134,8 +134,14 @@ function renderSubTabs() {
     const active = activeSubKey();
     container.innerHTML = Object.entries(subs).map(([key, sub]) => {
         const { done, total } = count(sub.items);
-        return `<button class="sub-tab ${key === active ? "active" : ""}" data-sub="${key}" data-tone="${toneOf(key)}">${sub.label}
-            <span class="tab-count">${done}/${total}</span></button>`;
+        const pct = total ? Math.round((done / total) * 100) : 0;
+        return `<button class="sub-tab ${key === active ? "active" : ""}" data-sub="${key}" data-tone="${toneOf(key)}">
+            <span class="nav-icon">${glyph(ui.tab, key)}</span>
+            <span class="nav-text">
+                <span class="nav-label">${sub.label}</span>
+                <span class="nav-progress"><span class="nav-bar"><i style="width:${pct}%"></i></span><span class="nav-count">${done}/${total}</span></span>
+            </span>
+        </button>`;
     }).join("");
 }
 

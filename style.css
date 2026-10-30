@@ -111,14 +111,19 @@ button { cursor: pointer; }
 .nav-bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
 .nav-count { font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); }
 .subbar { border-bottom: 1px solid var(--border); background: var(--bg); }
-.subbar .tabs { padding-top: 12px; padding-bottom: 12px; gap: 6px; }
+.subbar .tabs { padding-top: 12px; padding-bottom: 12px; gap: 8px; }
 .subbar .tabs:empty { padding: 0; }
 .sub-tab {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
-    padding: 5px 13px; font-size: 13px; color: var(--muted); white-space: nowrap; transition: border-color .15s, color .15s;
+    display: flex; align-items: center; gap: 9px; flex: 0 0 auto; min-width: 142px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 7px 12px; text-align: left; color: var(--muted); transition: border-color .15s, background .15s, color .15s;
 }
-.sub-tab:hover { border-color: var(--accent); color: var(--text); }
-.sub-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.sub-tab:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); color: var(--text); }
+.sub-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+.sub-tab .nav-icon { width: 30px; height: 30px; color: var(--tone, var(--muted)); }
+.sub-tab .nav-icon .glyph { width: 22px; height: 16px; }
+.sub-tab.active .nav-icon { background: var(--accent); color: var(--accent-ink); }
+.sub-tab .nav-label { font-size: 13px; }
 .tab-count { margin-left: 5px; font-size: 12px; font-weight: 500; opacity: .65; font-variant-numeric: tabular-nums; }
 
 /* Summary + toolbar */
@@ -153,7 +158,6 @@ button { cursor: pointer; }
 [data-tone="brand"] { --tone: var(--accent); }
 .item-row[data-tone]:not([data-tone=""]) { border-left: 4px solid var(--tone); }
 .item-row[data-tone]:not([data-tone=""]) .item-info span { color: var(--tone); }
-.sub-tab[data-tone]:not([data-tone=""])::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--tone); }
 
 /* Items */
 #items-grid { display: flex; flex-direction: column; gap: 8px; }
