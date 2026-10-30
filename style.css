@@ -278,12 +278,12 @@ body.view-hub #reset-btn { display: none; }
 
 
 /* ---------- Color: each section gets its own accent ---------- */
-[data-sec="weapons"] { --sec: #ff6600; --sec-ink: #1a0a00; --sec-soft: rgba(255, 102, 0, .15); }
-[data-sec="gear"] { --sec: #4da3ff; --sec-ink: #031225; --sec-soft: rgba(77, 163, 255, .15); }
+[data-sec="weapons"] { --sec: #e8a317; --sec-ink: #1c1300; --sec-soft: rgba(232, 163, 23, .15); }
+[data-sec="gear"] { --sec: #ff6600; --sec-ink: #1a0a00; --sec-soft: rgba(255, 102, 0, .15); }
 [data-sec="skills"] { --sec: #ffd700; --sec-ink: #1c1600; --sec-soft: rgba(255, 215, 0, .15); }
 [data-sec="collections"] { --sec: #4ade80; --sec-ink: #031a0c; --sec-soft: rgba(74, 222, 128, .15); }
-:root[data-theme="light"] [data-sec="weapons"] { --sec: #e65c00; --sec-ink: #fff; --sec-soft: rgba(230, 92, 0, .10); }
-:root[data-theme="light"] [data-sec="gear"] { --sec: #2563eb; --sec-ink: #fff; --sec-soft: rgba(37, 99, 235, .10); }
+:root[data-theme="light"] [data-sec="weapons"] { --sec: #a8710a; --sec-ink: #fff; --sec-soft: rgba(168, 113, 10, .10); }
+:root[data-theme="light"] [data-sec="gear"] { --sec: #e65c00; --sec-ink: #fff; --sec-soft: rgba(230, 92, 0, .10); }
 :root[data-theme="light"] [data-sec="skills"] { --sec: #ca8a04; --sec-ink: #fff; --sec-soft: rgba(202, 138, 4, .12); }
 :root[data-theme="light"] [data-sec="collections"] { --sec: #16a34a; --sec-ink: #fff; --sec-soft: rgba(22, 163, 74, .10); }
 [data-sec] { --accent: var(--sec); --accent-ink: var(--sec-ink); --accent-soft: var(--sec-soft); }
@@ -292,7 +292,7 @@ body.view-hub #reset-btn { display: none; }
 body {
     background:
         radial-gradient(900px 420px at 12% -140px, rgba(249, 115, 22, .16), transparent 70%),
-        radial-gradient(800px 380px at 92% -120px, rgba(77, 163, 255, .10), transparent 70%),
+        radial-gradient(800px 380px at 92% -120px, rgba(255, 215, 0, .09), transparent 70%),
         radial-gradient(700px 500px at 50% 110%, rgba(74, 222, 128, .06), transparent 70%),
         var(--bg);
     background-repeat: no-repeat; background-attachment: fixed;
@@ -300,13 +300,13 @@ body {
 :root[data-theme="light"] body {
     background:
         radial-gradient(900px 420px at 12% -140px, rgba(234, 88, 12, .10), transparent 70%),
-        radial-gradient(800px 380px at 92% -120px, rgba(37, 99, 235, .07), transparent 70%),
+        radial-gradient(800px 380px at 92% -120px, rgba(202, 138, 4, .08), transparent 70%),
         var(--bg);
     background-repeat: no-repeat; background-attachment: fixed;
 }
-.site-header { border-image: linear-gradient(90deg, #ff6600, #ffd700 35%, #4da3ff 70%, #4ade80) 1; border-bottom-width: 2px; }
+.site-header { border-image: linear-gradient(90deg, #e8a317, #ff6600 35%, #ffd700 70%, #4ade80) 1; border-bottom-width: 2px; }
 .brand-mark { background: linear-gradient(180deg, #fbbf24, var(--accent)); box-shadow: 0 0 14px rgba(249, 115, 22, .55); }
-body.view-hub #summary-bar { background: linear-gradient(90deg, #ff6600, #ffd700, #4ade80); }
+body.view-hub #summary-bar { background: linear-gradient(90deg, #e8a317, #ff6600, #ffd700, #4ade80); }
 #summary-pct { color: var(--accent); }
 
 /* Home page cards */
