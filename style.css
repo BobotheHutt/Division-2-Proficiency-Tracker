@@ -482,3 +482,14 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
     .mode-switch button { flex: 1; }
 }
 @media (max-width: 520px) { .plan-grid { grid-template-columns: 1fr; } }
+
+/* Small notes that sit straight on the background pattern: brighter text with a soft backing so lines don't cut through */
+.plan-hint, .hint {
+    color: var(--text); width: fit-content; max-width: 100%;
+    padding: 8px 14px; border-radius: 8px;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.hint { margin-left: auto; margin-right: auto; }
+.hint b, .plan-hint b { color: var(--accent); }
+.order-switch > span { color: var(--text); opacity: .85; }
