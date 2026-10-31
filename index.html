@@ -35,6 +35,10 @@
                 </svg>
                 <h1><span class="brand-name">Division 2</span><span class="brand-sub">Proficiency Tracker</span></h1>
             </div>
+            <nav class="mode-switch" id="mode-switch" aria-label="Pages">
+                <button type="button" data-mode="tracker">Tracker</button>
+                <button type="button" data-mode="planner">Planner</button>
+            </nav>
             <div class="header-actions">
                 <span id="sync-status" class="sync-status"></span>
                 <button type="button" class="btn primary needs-cloud" data-auth id="header-signin" hidden>Sign in</button>
@@ -111,7 +115,7 @@
             <div class="summary-text">
                 <button type="button" class="back-btn" data-back id="back-btn" hidden aria-label="Back to all categories">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
-                    Home
+                    <span id="back-label">Home</span>
                 </button>
                 <span id="summary-label"></span>
                 <span id="summary-pct"></span>
@@ -133,6 +137,7 @@
 
     <main class="container">
         <div id="hub"></div>
+        <div id="planner" hidden></div>
         <div id="list-view" hidden>
             <div id="list-nav"></div>
             <div id="list-tools" hidden></div>

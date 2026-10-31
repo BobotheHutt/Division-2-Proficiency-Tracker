@@ -94,9 +94,10 @@ function save(key, value) {
 
 // userProgress: { [itemId]: rank }
 let userProgress = load(STORAGE_KEY, {});
-const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game" }, load(UI_KEY, {}));
+const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game", mode: "tracker" }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
-ui.view = "hub"; // always start on the home page
+ui.view = ui.mode === "planner" ? "plan" : "hub"; // start on the page you used last
+ui.planSlot = null;
 
 // Color coding: brands = orange, gear sets = green. Named (gold) and exotic (red) items are flagged in the data.
 const toneOf = tab => (tab === "gearSets" ? "set" : tab === "brands" ? "brand" : "");
@@ -234,6 +235,11 @@ function renderListNav() {
 
 function renderSummary() {
     const label = document.getElementById("summary-label");
+    if (ui.view === "planlist") {
+        const def = PLAN_POOLS[ui.planSlot];
+        label.textContent = `${def.title}: ${inProgress(def.pool()).length} in progress`;
+        return;
+    }
     let items, name;
     if (ui.view === "hub") { items = allItems(); name = "Overall"; }
     else { const sub = CATEGORIES[ui.tab].subs[activeSubKey()]; items = sub.items; name = sub.label; }
@@ -259,14 +265,42 @@ function renderListTools() {
         </div></div>`;
 }
 
+const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
+
+// One list row (or card) for an item; also used by the Planner's progress list.
+function itemMarkup(item, tab, sub, asCard) {
+    const rank = rankOf(item.id);
+    const done = rank >= MAX_RANK;
+    const isCollection = tab === "brands" || tab === "gearSets";
+    const flags = `${done ? "done" : ""} ${item.named ? "named" : ""} ${item.exotic ? "exotic" : ""}`;
+    const check = `<label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>`;
+    const badge = iconManifest[item.id]
+        ? `<span class="item-icon"><img src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy"></span>`
+        : `<span class="item-icon">${isCollection ? `<span class="monogram">${esc(monogram(item.name))}</span>` : glyph(tab, sub)}</span>`;
+    const slider = `<div class="rank-wrap">
+            <input type="range" class="rank-slider" min="0" max="${MAX_RANK}" value="${rank}" style="--pct:${rank * 10}%" aria-label="Rank: ${esc(item.name)}">
+            <span class="rank-value"><b>${rank}</b>/${MAX_RANK}</span>
+        </div>`;
+    if (asCard) {
+        return `<div class="item-row item-card ${flags}" data-id="${esc(item.id)}" data-tone="${toneOf(tab)}">
+        <div class="card-top">${check}${badge}<h3>${esc(item.name)}</h3></div>
+        ${slider}
+    </div>`;
+    }
+    return `<div class="item-row ${flags}" data-id="${esc(item.id)}" data-tone="${toneOf(tab)}">
+        ${check}${badge}
+        <div class="item-info"><h3>${esc(item.name)}</h3></div>
+        ${slider}
+    </div>`;
+}
+
 function renderItems() {
     const grid = document.getElementById("items-grid");
     const sub = CATEGORIES[ui.tab].subs[activeSubKey()];
     const isCollection = isCollectionTab();
     grid.classList.toggle("cards", isCollection);
-    // Plain character order (digits first, accented letters after z) to match the in-game list.
-    const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
     const shown = sub.items.filter(visible);
+    // Brands and gear sets can follow the game's order; everything else is A-Z in plain character order.
     const items = isCollection && ui.order === "game" ? shown : shown.sort(byName);
 
     if (!items.length) {
@@ -276,53 +310,133 @@ function renderItems() {
             : "No items here yet."}</div>`;
         return;
     }
+    grid.innerHTML = items.map(item => itemMarkup(item, ui.tab, activeSubKey(), isCollection)).join("");
+}
 
-    const tone = toneOf(ui.tab);
-    const icon = glyph(ui.tab, activeSubKey());
-    grid.innerHTML = items.map(item => {
-        const rank = rankOf(item.id);
-        const done = rank >= MAX_RANK;
-        const flags = `${done ? "done" : ""} ${item.named ? "named" : ""} ${item.exotic ? "exotic" : ""}`;
-        const check = `<label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>`;
-        const badge = iconManifest[item.id]
-            ? `<span class="item-icon"><img src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy"></span>`
-            : `<span class="item-icon">${isCollection ? `<span class="monogram">${esc(monogram(item.name))}</span>` : icon}</span>`;
-        const slider = `<div class="rank-wrap">
-                <input type="range" class="rank-slider" min="0" max="${MAX_RANK}" value="${rank}" style="--pct:${rank * 10}%" aria-label="Rank: ${esc(item.name)}">
-                <span class="rank-value"><b>${rank}</b>/${MAX_RANK}</span>
-            </div>`;
-        if (isCollection) {
-            return `<div class="item-row item-card ${flags}" data-id="${esc(item.id)}" data-tone="${tone}">
-            <div class="card-top">${check}${badge}<h3>${esc(item.name)}</h3></div>
-            ${slider}
-        </div>`;
-        }
-        return `<div class="item-row ${flags}" data-id="${esc(item.id)}" data-tone="${tone}">
-            ${check}${badge}
-            <div class="item-info"><h3>${esc(item.name)}</h3></div>
-            ${slider}
-        </div>`;
-    }).join("");
+// --- Planner: the item closest to proficiency for each slot, laid out like the in-game gear screen ---
+const planIndex = new Map(); // item id -> { tab, sub }
+for (const [tab, cat] of Object.entries(CATEGORIES))
+    for (const [sub, s] of Object.entries(cat.subs))
+        for (const item of s.items) planIndex.set(item.id, { tab, sub });
+
+const poolOf = (tab, subs) => subs.flatMap(s => CATEGORIES[tab].subs[s].items);
+const PLAN_POOLS = {
+    spec: { title: "Specialization weapons", sec: "weapons", pool: () => poolOf("weapons", ["specialization"]) },
+    weapons: { title: "Primary & secondary weapons", sec: "weapons", pool: () => poolOf("weapons", ["rifles", "assaultRifles", "marksmanRifles", "shotguns", "smgs", "lmgs"]) },
+    sidearm: { title: "Sidearms", sec: "weapons", pool: () => poolOf("weapons", ["pistols"]) },
+    masks: { title: "Masks", sec: "gear", pool: () => poolOf("namedExotic", ["masks"]) },
+    backpacks: { title: "Backpacks", sec: "gear", pool: () => poolOf("namedExotic", ["backpacks"]) },
+    bodyArmor: { title: "Body armor", sec: "gear", pool: () => poolOf("namedExotic", ["bodyArmor"]) },
+    gloves: { title: "Gloves", sec: "gear", pool: () => poolOf("namedExotic", ["gloves"]) },
+    holsters: { title: "Holsters", sec: "gear", pool: () => poolOf("namedExotic", ["holsters"]) },
+    kneepads: { title: "Kneepads", sec: "gear", pool: () => poolOf("namedExotic", ["kneepads"]) },
+    brands: { title: "Brands", sec: "collections", pool: () => CATEGORIES.brands.subs.all.items },
+    gearSets: { title: "Gear sets", sec: "collections", pool: () => CATEGORIES.gearSets.subs.all.items },
+    skills: { title: "Skills", sec: "skills", pool: () => Object.values(CATEGORIES.skills.subs).flatMap(s => s.items) },
+};
+// n = 0 closest, 1 second closest. null = an empty cell that keeps the in-game layout.
+const PLAN = [
+    { title: "Weapons", sec: "weapons", slots: [
+        { label: "Specialization", pool: "spec", n: 0, icon: ["weapons", "specialization"] }, null, null,
+        { label: "Primary", pool: "weapons", n: 0, icon: ["weapons", "assaultRifles"] },
+        { label: "Secondary", pool: "weapons", n: 1, icon: ["weapons", "smgs"] },
+        { label: "Sidearm", pool: "sidearm", n: 0, icon: ["weapons", "pistols"] },
+    ] },
+    { title: "Gear", sec: "gear", slots: [
+        { label: "Mask", pool: "masks", n: 0, icon: ["namedExotic", "masks"] },
+        { label: "Backpack", pool: "backpacks", n: 0, icon: ["namedExotic", "backpacks"] },
+        { label: "Brand", pool: "brands", n: 0, sec: "collections", icon: ["brands", "all"] },
+        { label: "Body Armor", pool: "bodyArmor", n: 0, icon: ["namedExotic", "bodyArmor"] },
+        { label: "Gloves", pool: "gloves", n: 0, icon: ["namedExotic", "gloves"] },
+        { label: "Gear Set", pool: "gearSets", n: 0, sec: "collections", icon: ["gearSets", "all"] },
+        { label: "Holster", pool: "holsters", n: 0, icon: ["namedExotic", "holsters"] },
+        { label: "Kneepads", pool: "kneepads", n: 0, icon: ["namedExotic", "kneepads"] },
+    ] },
+    { title: "Skills", sec: "skills", slots: [
+        { label: "Skill 1", pool: "skills", n: 0, icon: ["skills", "drone"] },
+        { label: "Skill 2", pool: "skills", n: 1, icon: ["skills", "drone"] },
+    ] },
+];
+
+// Items with some progress (rank 1-9), highest rank first. Proficient items drop out.
+const inProgress = pool => pool
+    .filter(i => { const r = rankOf(i.id); return r > 0 && r < MAX_RANK; })
+    .sort((a, b) => rankOf(b.id) - rankOf(a.id) || byName(a, b));
+
+function planCard(slot) {
+    if (!slot) return `<div class="plan-spacer" aria-hidden="true"></div>`;
+    const pool = PLAN_POOLS[slot.pool].pool();
+    const item = inProgress(pool)[slot.n];
+    const allDone = pool.length > 0 && pool.every(i => isDone(i.id));
+    const where = item && planIndex.get(item.id);
+    const collection = where && (where.tab === "brands" || where.tab === "gearSets");
+    const icon = item
+        ? (collection ? `<span class="monogram">${esc(monogram(item.name))}</span>` : glyph(where.tab, where.sub))
+        : glyph(...slot.icon);
+    const rank = item ? rankOf(item.id) : 0;
+    const flag = item ? `${item.named ? "named" : ""} ${item.exotic ? "exotic" : ""}` : "";
+    const name = item ? esc(item.name) : (allDone ? "All proficient" : "No progress yet");
+    return `<button type="button" class="plan-card ${item ? "" : "empty"}" data-plan="${slot.pool}"${slot.sec ? ` data-sec="${slot.sec}"` : ""}>
+        <span class="plan-icon">${icon}</span>
+        <span class="plan-text">
+            <span class="plan-slot">${slot.label}</span>
+            <span class="plan-name ${flag}">${name}</span>
+            <span class="plan-meter"><span class="plan-bar"><i style="width:${rank * 10}%"></i></span><b>${item ? `${rank}/${MAX_RANK}` : "\u2013"}</b></span>
+        </span>
+    </button>`;
+}
+
+function renderPlanner() {
+    const any = Object.values(PLAN_POOLS).some(p => inProgress(p.pool()).length);
+    document.getElementById("planner").innerHTML =
+        `<p class="plan-hint">${any ? "Closest to proficiency in each slot. Click a card to see everything in progress for it." : "Nothing is in progress yet. Give items a rank in the Tracker and the closest ones show up here."}</p>` +
+        PLAN.map(s => `<section class="hub-section plan-section" data-sec="${s.sec}">
+            <h2>${s.title}</h2>
+            <div class="plan-grid">${s.slots.map(planCard).join("")}</div>
+        </section>`).join("");
+}
+
+function renderPlanList() {
+    const grid = document.getElementById("items-grid");
+    grid.classList.remove("cards");
+    const items = inProgress(PLAN_POOLS[ui.planSlot].pool());
+    if (!items.length) {
+        grid.innerHTML = `<div class="empty">Nothing in progress here yet. Give an item a rank above 0 in the Tracker and it will show up here.</div>`;
+        return;
+    }
+    grid.innerHTML = items.map(item => { const o = planIndex.get(item.id); return itemMarkup(item, o.tab, o.sub, false); }).join("");
 }
 
 function renderAll() {
-    const hub = ui.view === "hub";
-    document.body.classList.toggle("view-hub", hub);
-    document.getElementById("hub").hidden = !hub;
-    document.getElementById("list-view").hidden = hub;
-    document.getElementById("list-nav").hidden = hub;
-    document.getElementById("back-btn").hidden = hub;
-    // In the list view the whole working area takes the section's color.
-    const sec = hub ? null : groupOf(ui.tab).key;
+    const v = ui.view; // hub | list (Tracker)  plan | planlist (Planner)
+    const planner = v === "plan" || v === "planlist";
+    const listish = v === "list" || v === "planlist";
+    document.body.classList.toggle("view-hub", v === "hub");
+    document.body.classList.toggle("view-plan", v === "plan");
+    document.body.classList.toggle("view-planlist", v === "planlist");
+    document.getElementById("hub").hidden = v !== "hub";
+    document.getElementById("planner").hidden = v !== "plan";
+    document.getElementById("list-view").hidden = !listish;
+    document.getElementById("list-nav").hidden = v !== "list";
+    document.getElementById("list-tools").hidden = v !== "list";
+    document.getElementById("back-btn").hidden = !listish;
+    document.getElementById("back-label").textContent = v === "planlist" ? "Planner" : "Home";
+    document.querySelector(".controls").hidden = v === "plan";
+    document.querySelectorAll("#mode-switch [data-mode]").forEach(b =>
+        b.classList.toggle("active", b.dataset.mode === (planner ? "planner" : "tracker")));
+    // The working area takes the section's color.
+    const sec = v === "list" ? groupOf(ui.tab).key : v === "planlist" ? PLAN_POOLS[ui.planSlot].sec : null;
     for (const id of ["list-nav", "list-view"]) {
         const el = document.getElementById(id);
         if (sec) el.dataset.sec = sec; else el.removeAttribute("data-sec");
     }
     const controls = document.querySelector(".controls");
     if (sec) controls.dataset.sec = sec; else controls.removeAttribute("data-sec");
-    document.body.classList.toggle("collection", !hub && isCollectionTab());
+    document.body.classList.toggle("collection", v === "list" && isCollectionTab());
     renderSummary();
-    if (hub) renderHub();
+    if (v === "hub") renderHub();
+    else if (v === "plan") renderPlanner();
+    else if (v === "planlist") renderPlanList();
     else { renderListNav(); renderListTools(); renderItems(); }
 }
 
@@ -336,7 +450,7 @@ function refreshRow(row) {
     slider.value = rank;
     slider.style.setProperty("--pct", `${rank * 10}%`);
     row.querySelector(".proficient-checkbox").checked = rank >= MAX_RANK;
-    renderListNav();
+    if (ui.view === "list") renderListNav();
     renderSummary();
 }
 
@@ -352,14 +466,38 @@ function openCategory(tab, sub) {
     renderAll();
     window.scrollTo(0, 0);
 }
+function openPlanList(key) {
+    if (!PLAN_POOLS[key]) return;
+    ui.planSlot = key;
+    ui.view = "planlist";
+    history.pushState({ v: "planlist", k: key }, "");
+    renderAll();
+    window.scrollTo(0, 0);
+}
 function goHome() {
-    if (history.state?.v === "list") { history.back(); return; }
-    ui.view = "hub";
+    if (history.state?.v === "list" || history.state?.v === "planlist") { history.back(); return; }
+    ui.view = ui.mode === "planner" ? "plan" : "hub";
     renderAll();
 }
 window.addEventListener("popstate", e => {
-    ui.view = e.state?.v === "list" ? "list" : "hub";
+    const s = e.state;
+    if (s?.v === "list") ui.view = "list";
+    else if (s?.v === "planlist" && PLAN_POOLS[s.k]) { ui.view = "planlist"; ui.planSlot = s.k; }
+    else ui.view = ui.mode === "planner" ? "plan" : "hub";
     renderAll();
+});
+
+// Tracker <-> Planner
+document.getElementById("mode-switch").addEventListener("click", e => {
+    const b = e.target.closest("[data-mode]");
+    if (!b) return;
+    if (history.state?.v) history.replaceState(null, "");
+    ui.mode = b.dataset.mode;
+    ui.view = ui.mode === "planner" ? "plan" : "hub";
+    ui.planSlot = null;
+    save(UI_KEY, ui);
+    renderAll();
+    window.scrollTo(0, 0);
 });
 
 document.addEventListener("click", e => {
@@ -377,6 +515,8 @@ document.addEventListener("click", e => {
         renderListNav();
         return;
     }
+    const plan = e.target.closest("[data-plan]");
+    if (plan) { openPlanList(plan.dataset.plan); return; }
     const open = e.target.closest("[data-open]");
     if (open) { openCategory(...open.dataset.open.split("|")); return; }
     if (e.target.closest("[data-back]")) goHome();
@@ -388,14 +528,19 @@ grid.addEventListener("input", e => {
     if (!row || !e.target.classList.contains("rank-slider")) return;
     setRank(row.dataset.id, parseInt(e.target.value, 10) || 0);
     refreshRow(row);
-    if (ui.hideDone && isDone(row.dataset.id)) renderItems();
+    if (ui.view === "list" && ui.hideDone && isDone(row.dataset.id)) renderItems();
 });
 grid.addEventListener("change", e => {
     const row = e.target.closest(".item-row");
-    if (!row || !e.target.classList.contains("proficient-checkbox")) return;
-    setRank(row.dataset.id, e.target.checked ? MAX_RANK : 0);
-    refreshRow(row);
-    if (ui.hideDone) renderItems();
+    if (!row) return;
+    const isBox = e.target.classList.contains("proficient-checkbox");
+    if (isBox) {
+        setRank(row.dataset.id, e.target.checked ? MAX_RANK : 0);
+        refreshRow(row);
+    } else if (!e.target.classList.contains("rank-slider")) return;
+    // In the Planner's list, finished (or reset) items leave once you let go.
+    if (ui.view === "planlist") { renderSummary(); renderPlanList(); return; }
+    if (isBox && ui.hideDone) renderItems();
 });
 
 const searchBox = document.getElementById("search");
