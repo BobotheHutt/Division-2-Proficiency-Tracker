@@ -532,3 +532,5 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
     .brand h1 .brand-name { font-size: 14px; }
     .brand-sub { letter-spacing: .2em; }
 }
+
+.item-sub { display: block; margin-top: 2px; font-size: 12px; color: var(--muted); }

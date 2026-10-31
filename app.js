@@ -276,7 +276,7 @@ function renderListTools() {
 const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
 
 // One list row (or card) for an item; also used by the Planner's progress list.
-function itemMarkup(item, tab, sub, asCard) {
+function itemMarkup(item, tab, sub, asCard, subLabel = "") {
     const rank = rankOf(item.id);
     const done = rank >= MAX_RANK;
     const isCollection = tab === "brands" || tab === "gearSets";
@@ -297,7 +297,7 @@ function itemMarkup(item, tab, sub, asCard) {
     }
     return `<div class="item-row ${flags}" data-id="${esc(item.id)}" data-tone="${toneOf(tab)}">
         ${check}${badge}
-        <div class="item-info"><h3>${esc(item.name)}</h3></div>
+        <div class="item-info"><h3>${esc(item.name)}</h3>${subLabel ? `<span class="item-sub">${esc(subLabel)}</span>` : ""}</div>
         ${slider}
     </div>`;
 }
@@ -366,6 +366,8 @@ const PLAN = [
     ] },
 ];
 
+const PLAN_SHOW_SUB = new Set(["weapons", "skills"]); // pools whose items come from several categories
+
 // Items with some progress (rank 1-9), highest rank first; optionally also ones at 0/10. Proficient items drop out.
 const inProgress = pool => pool
     .filter(i => { const r = rankOf(i.id); return r < MAX_RANK && (ui.planZero || r > 0); })
@@ -384,10 +386,12 @@ function planCard(slot) {
     const rank = item ? rankOf(item.id) : 0;
     const flag = item ? `${item.named ? "named" : ""} ${item.exotic ? "exotic" : ""}` : "";
     const name = item ? esc(item.name) : (allDone ? "All proficient" : "No progress yet");
+    // Skills and weapons share names across categories (two different "Striker"s), so say which one this is.
+    const what = item && PLAN_SHOW_SUB.has(slot.pool) ? CATEGORIES[where.tab].subs[where.sub].label : "";
     return `<button type="button" class="plan-card ${item ? "" : "empty"}" data-plan="${slot.pool}"${slot.sec ? ` data-sec="${slot.sec}"` : ""}>
         <span class="plan-icon">${icon}</span>
         <span class="plan-text">
-            <span class="plan-slot">${slot.label}</span>
+            <span class="plan-slot">${slot.label}${what ? ` \u00b7 ${esc(what)}` : ""}</span>
             <span class="plan-name ${flag}">${name}</span>
             <span class="plan-meter"><span class="plan-bar"><i style="width:${rank * 10}%"></i></span><b>${item ? `${rank}/${MAX_RANK}` : "\u2013"}</b></span>
         </span>
@@ -417,7 +421,11 @@ function renderPlanList() {
         grid.innerHTML = `<div class="empty">${ui.planZero ? "Everything here is already proficient." : "Nothing in progress here yet. Give an item a rank above 0 in the Tracker, or turn on Include 0/10."}</div>`;
         return;
     }
-    grid.innerHTML = items.map(item => { const o = planIndex.get(item.id); return itemMarkup(item, o.tab, o.sub, false); }).join("");
+    const showSub = PLAN_SHOW_SUB.has(ui.planSlot);
+    grid.innerHTML = items.map(item => {
+        const o = planIndex.get(item.id);
+        return itemMarkup(item, o.tab, o.sub, false, showSub ? CATEGORIES[o.tab].subs[o.sub].label : "");
+    }).join("");
 }
 
 function renderAll() {
