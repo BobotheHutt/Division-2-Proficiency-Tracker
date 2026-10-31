@@ -3,7 +3,6 @@ export const bodyArmor = [
     { id: "ng_hunter_killer", name: "Hunter-Killer", variant: "Body Armor", named: true },
     { id: "ng_everyday_carrier", name: "Everyday Carrier", variant: "Body Armor", named: true },
     { id: "ng_chainkiller", name: "Chainkiller", variant: "Body Armor", named: true },
-    { id: "ng_pointman", name: "Pointman", variant: "Body Armor", named: true },
     { id: "ng_vedmedytsya_vest", name: "Vedmedytsya Vest", variant: "Body Armor", named: true },
     { id: "ng_the_sacrifice", name: "The Sacrifice", variant: "Body Armor", named: true },
     { id: "ng_zero_f_s", name: "Zero F's", variant: "Body Armor", named: true },
