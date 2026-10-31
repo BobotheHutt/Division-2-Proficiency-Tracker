@@ -11,7 +11,7 @@ export const rifles = [
     { id: "rifle_baker_s_dozen", name: "Baker's Dozen", variant: "Rifle", named: true },
     { id: "rifle_stage_left", name: "Stage Left", variant: "Rifle", named: true },
     { id: "rifle_cooler", name: "Cooler", variant: "Rifle", named: true },
-    { id: "rifle_bittersweet", name: "Bittersweet", variant: "Rifle", named: true },
+    { id: "rifle_bittersweet", name: "Bittersweet", variant: "Rifle", exotic: true },
     { id: "rifle_doctor_home", name: "Doctor Home", variant: "Rifle", exotic: true },
     { id: "rifle_lightweight_m4", name: "Lightweight M4", variant: "Rifle" },
     { id: "rifle_lvoa_c", name: "LVOA-C", variant: "Rifle" },
