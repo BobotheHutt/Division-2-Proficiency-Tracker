@@ -94,7 +94,7 @@ function save(key, value) {
 
 // userProgress: { [itemId]: rank }
 let userProgress = load(STORAGE_KEY, {});
-const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game", mode: "tracker" }, load(UI_KEY, {}));
+const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game", mode: "tracker", planZero: false }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 ui.view = ui.mode === "planner" ? "plan" : "hub"; // start on the page you used last
 ui.planSlot = null;
@@ -135,8 +135,11 @@ const pctOf = ({ done, total }) => (total ? Math.round((done / total) * 100) : 0
 let currentUser = null;
 let syncTimer = null;
 
+// The header chip shows the signed-in Google email; its dot shows sync state (green saved, orange busy, red failed).
 function setSyncStatus(text) {
-    document.getElementById("sync-status").textContent = text;
+    const chip = document.getElementById("account-chip");
+    chip.dataset.state = !text ? "" : /fail/i.test(text) ? "failed" : /saving|syncing/i.test(text) ? "busy" : "ok";
+    chip.title = [currentUser?.email, text].filter(Boolean).join(" \u00b7 ");
 }
 
 function persist() {
@@ -256,7 +259,12 @@ const isCollectionTab = () => ui.tab === "brands" || ui.tab === "gearSets";
 // Brands and gear sets can follow the in-game order (the order of their data files) or go A-Z.
 function renderListTools() {
     const el = document.getElementById("list-tools");
-    el.hidden = !isCollectionTab();
+    if (ui.view === "planlist") {
+        el.hidden = false;
+        el.innerHTML = `<div class="order-switch">${planZeroToggle()}</div>`;
+        return;
+    }
+    el.hidden = ui.view !== "list" || !isCollectionTab();
     if (el.hidden) { el.innerHTML = ""; return; }
     el.innerHTML = `<div class="order-switch"><span>Order</span>
         <div class="segmented small" role="group" aria-label="Order">
@@ -358,9 +366,9 @@ const PLAN = [
     ] },
 ];
 
-// Items with some progress (rank 1-9), highest rank first. Proficient items drop out.
+// Items with some progress (rank 1-9), highest rank first; optionally also ones at 0/10. Proficient items drop out.
 const inProgress = pool => pool
-    .filter(i => { const r = rankOf(i.id); return r > 0 && r < MAX_RANK; })
+    .filter(i => { const r = rankOf(i.id); return r < MAX_RANK && (ui.planZero || r > 0); })
     .sort((a, b) => rankOf(b.id) - rankOf(a.id) || byName(a, b));
 
 function planCard(slot) {
@@ -386,10 +394,15 @@ function planCard(slot) {
     </button>`;
 }
 
+const planZeroToggle = () => `<label class="chip-toggle"><input type="checkbox" data-plan-zero ${ui.planZero ? "checked" : ""}><span>Include 0/10</span></label>`;
+
 function renderPlanner() {
     const any = Object.values(PLAN_POOLS).some(p => inProgress(p.pool()).length);
+    const hint = !any ? "Nothing is in progress yet. Give items a rank in the Tracker, or turn on Include 0/10 to see where to start."
+        : ui.planZero ? "Closest to proficiency in each slot, including items you haven't started. Click a card to see the list."
+        : "Closest to proficiency in each slot. Click a card to see everything in progress for it.";
     document.getElementById("planner").innerHTML =
-        `<p class="plan-hint">${any ? "Closest to proficiency in each slot. Click a card to see everything in progress for it." : "Nothing is in progress yet. Give items a rank in the Tracker and the closest ones show up here."}</p>` +
+        `<div class="plan-tools"><p class="plan-hint">${hint}</p>${planZeroToggle()}</div>` +
         PLAN.map(s => `<section class="hub-section plan-section" data-sec="${s.sec}">
             <h2>${s.title}</h2>
             <div class="plan-grid">${s.slots.map(planCard).join("")}</div>
@@ -401,7 +414,7 @@ function renderPlanList() {
     grid.classList.remove("cards");
     const items = inProgress(PLAN_POOLS[ui.planSlot].pool());
     if (!items.length) {
-        grid.innerHTML = `<div class="empty">Nothing in progress here yet. Give an item a rank above 0 in the Tracker and it will show up here.</div>`;
+        grid.innerHTML = `<div class="empty">${ui.planZero ? "Everything here is already proficient." : "Nothing in progress here yet. Give an item a rank above 0 in the Tracker, or turn on Include 0/10."}</div>`;
         return;
     }
     grid.innerHTML = items.map(item => { const o = planIndex.get(item.id); return itemMarkup(item, o.tab, o.sub, false); }).join("");
@@ -418,7 +431,7 @@ function renderAll() {
     document.getElementById("planner").hidden = v !== "plan";
     document.getElementById("list-view").hidden = !listish;
     document.getElementById("list-nav").hidden = v !== "list";
-    document.getElementById("list-tools").hidden = v !== "list";
+    document.getElementById("list-tools").hidden = true;
     document.getElementById("back-btn").hidden = !listish;
     document.getElementById("back-label").textContent = v === "planlist" ? "Planner" : "Home";
     document.querySelector(".controls").hidden = v === "plan";
@@ -436,7 +449,7 @@ function renderAll() {
     renderSummary();
     if (v === "hub") renderHub();
     else if (v === "plan") renderPlanner();
-    else if (v === "planlist") renderPlanList();
+    else if (v === "planlist") { renderListTools(); renderPlanList(); }
     else { renderListNav(); renderListTools(); renderItems(); }
 }
 
@@ -498,6 +511,13 @@ document.getElementById("mode-switch").addEventListener("click", e => {
     save(UI_KEY, ui);
     renderAll();
     window.scrollTo(0, 0);
+});
+
+document.addEventListener("change", e => {
+    if (!e.target.matches("[data-plan-zero]")) return;
+    ui.planZero = e.target.checked;
+    save(UI_KEY, ui);
+    renderAll();
 });
 
 document.addEventListener("click", e => {
@@ -765,8 +785,10 @@ function renderAuth() {
     const signedIn = !!currentUser;
     authButtons.forEach(b => { b.textContent = signedIn ? "Log out" : (b === headerSignIn ? "Sign in" : "Sign in with Google"); b.disabled = false; });
     headerSignIn.hidden = signedIn;
+    document.getElementById("account-chip").hidden = !signedIn;
+    document.getElementById("account-email").textContent = signedIn ? currentUser.email : "";
     accountInfo.textContent = signedIn
-        ? `Signed in as ${currentUser.displayName || currentUser.email}. Progress syncs across devices.`
+        ? `Signed in as ${currentUser.email}. Progress syncs across devices.`
         : "Not signed in. Progress is saved in this browser only.";
 }
 

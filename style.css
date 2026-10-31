@@ -493,3 +493,42 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 .hint { margin-left: auto; margin-right: auto; }
 .hint b, .plan-hint b { color: var(--accent); }
 .order-switch > span { color: var(--text); opacity: .85; }
+
+/* ---------- Header: colorful account chip and settings gear ---------- */
+:root { --gear-a: #ff6600; --gear-b: #ffd700; }
+:root[data-theme="light"] { --gear-a: #e65c00; --gear-b: #b8860b; }
+#settings-btn svg { filter: drop-shadow(0 0 5px rgba(255, 140, 0, .5)); transition: transform .3s; }
+:root[data-theme="light"] #settings-btn svg { filter: none; }
+#settings-btn:hover svg { transform: rotate(45deg); }
+.account-chip {
+    display: inline-flex; align-items: center; gap: 8px; max-width: 260px; padding: 5px 13px; border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+    border: 1px solid color-mix(in srgb, #ff8a3d 55%, var(--border));
+    background: linear-gradient(90deg, rgba(255, 102, 0, .20), rgba(255, 215, 0, .10));
+}
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--muted); color: var(--muted); box-shadow: 0 0 8px currentColor; }
+.account-chip[data-state="ok"] .sync-dot { background: #4ade80; color: #4ade80; }
+.account-chip[data-state="busy"] .sync-dot { background: #ff6600; color: #ff6600; }
+.account-chip[data-state="failed"] .sync-dot { background: #ef4444; color: #ef4444; }
+#account-email {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    background: linear-gradient(90deg, #ff8a3d, #ffd700); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+:root[data-theme="light"] #account-email { background-image: linear-gradient(90deg, #c2410c, #a16207); }
+:root[data-theme="light"] .account-chip { background: linear-gradient(90deg, rgba(230, 92, 0, .12), rgba(184, 134, 11, .08)); }
+:root[data-theme="light"] .account-chip[data-state="ok"] .sync-dot { background: #16a34a; color: #16a34a; }
+@media (max-width: 640px) { .account-chip { max-width: 132px; padding: 4px 9px; gap: 6px; } }
+
+/* Planner: hint + the 0/10 toggle on one row */
+.plan-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.plan-tools .plan-hint { margin: 0; }
+
+.chip-toggle { position: relative; }
+
+/* Phones: keep logo, email chip and gear on one row; the Tracker/Planner switch gets its own row below */
+@media (max-width: 640px) {
+    .header-actions { margin-left: auto; gap: 6px; }
+    .account-chip { max-width: 112px; }
+    .brand h1 .brand-name { font-size: 14px; }
+    .brand-sub { letter-spacing: .2em; }
+}
