@@ -94,7 +94,7 @@ function save(key, value) {
 
 // userProgress: { [itemId]: rank }
 let userProgress = load(STORAGE_KEY, {});
-const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0 }, load(UI_KEY, {}));
+const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game" }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 ui.view = "hub"; // always start on the home page
 
@@ -245,12 +245,29 @@ function renderSummary() {
     document.getElementById("summary-bar").style.width = `${pctOf(c)}%`;
 }
 
+const isCollectionTab = () => ui.tab === "brands" || ui.tab === "gearSets";
+
+// Brands and gear sets can follow the in-game order (the order of their data files) or go A-Z.
+function renderListTools() {
+    const el = document.getElementById("list-tools");
+    el.hidden = !isCollectionTab();
+    if (el.hidden) { el.innerHTML = ""; return; }
+    el.innerHTML = `<div class="order-switch"><span>Order</span>
+        <div class="segmented small" role="group" aria-label="Order">
+            <button type="button" data-order="game" class="${ui.order === "game" ? "active" : ""}">Game</button>
+            <button type="button" data-order="az" class="${ui.order === "az" ? "active" : ""}">A\u2013Z</button>
+        </div></div>`;
+}
+
 function renderItems() {
     const grid = document.getElementById("items-grid");
     const sub = CATEGORIES[ui.tab].subs[activeSubKey()];
+    const isCollection = isCollectionTab();
+    grid.classList.toggle("cards", isCollection);
     // Plain character order (digits first, accented letters after z) to match the in-game list.
     const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
-    const items = sub.items.filter(visible).sort(byName);
+    const shown = sub.items.filter(visible);
+    const items = isCollection && ui.order === "game" ? shown : shown.sort(byName);
 
     if (!items.length) {
         const elsewhere = countVisible(allItems());
@@ -262,22 +279,28 @@ function renderItems() {
 
     const tone = toneOf(ui.tab);
     const icon = glyph(ui.tab, activeSubKey());
-    const isCollection = ui.tab === "brands" || ui.tab === "gearSets";
     grid.innerHTML = items.map(item => {
         const rank = rankOf(item.id);
         const done = rank >= MAX_RANK;
-        return `<div class="item-row ${done ? "done" : ""} ${item.named ? "named" : ""} ${item.exotic ? "exotic" : ""}" data-id="${esc(item.id)}" data-tone="${tone}">
-            <label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>
-            ${iconManifest[item.id]
-                ? `<span class="item-icon"><img src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy"></span>`
-                : `<span class="item-icon">${isCollection ? `<span class="monogram">${esc(monogram(item.name))}</span>` : icon}</span>`}
-            <div class="item-info">
-                <h3>${esc(item.name)}</h3>
-            </div>
-            <div class="rank-wrap">
+        const flags = `${done ? "done" : ""} ${item.named ? "named" : ""} ${item.exotic ? "exotic" : ""}`;
+        const check = `<label class="check"><input type="checkbox" class="proficient-checkbox" ${done ? "checked" : ""} aria-label="Proficient: ${esc(item.name)}"></label>`;
+        const badge = iconManifest[item.id]
+            ? `<span class="item-icon"><img src="icons/${encodeURIComponent(iconManifest[item.id])}" alt="" loading="lazy"></span>`
+            : `<span class="item-icon">${isCollection ? `<span class="monogram">${esc(monogram(item.name))}</span>` : icon}</span>`;
+        const slider = `<div class="rank-wrap">
                 <input type="range" class="rank-slider" min="0" max="${MAX_RANK}" value="${rank}" style="--pct:${rank * 10}%" aria-label="Rank: ${esc(item.name)}">
                 <span class="rank-value"><b>${rank}</b>/${MAX_RANK}</span>
-            </div>
+            </div>`;
+        if (isCollection) {
+            return `<div class="item-row item-card ${flags}" data-id="${esc(item.id)}" data-tone="${tone}">
+            <div class="card-top">${check}${badge}<h3>${esc(item.name)}</h3></div>
+            ${slider}
+        </div>`;
+        }
+        return `<div class="item-row ${flags}" data-id="${esc(item.id)}" data-tone="${tone}">
+            ${check}${badge}
+            <div class="item-info"><h3>${esc(item.name)}</h3></div>
+            ${slider}
         </div>`;
     }).join("");
 }
@@ -297,9 +320,10 @@ function renderAll() {
     }
     const controls = document.querySelector(".controls");
     if (sec) controls.dataset.sec = sec; else controls.removeAttribute("data-sec");
+    document.body.classList.toggle("collection", !hub && isCollectionTab());
     renderSummary();
     if (hub) renderHub();
-    else { renderListNav(); renderItems(); }
+    else { renderListNav(); renderListTools(); renderItems(); }
 }
 
 // Update one row in place so dragging a slider isn't interrupted by a re-render.
@@ -339,6 +363,14 @@ window.addEventListener("popstate", e => {
 });
 
 document.addEventListener("click", e => {
+    const ord = e.target.closest("[data-order]");
+    if (ord) {
+        ui.order = ord.dataset.order;
+        save(UI_KEY, ui);
+        renderListTools();
+        renderItems();
+        return;
+    }
     if (e.target.closest("[data-nav-toggle]")) {
         ui.navOpen = !ui.navOpen;
         save(UI_KEY, ui);

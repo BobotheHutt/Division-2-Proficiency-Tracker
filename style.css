@@ -424,3 +424,18 @@ body::before {
 
 /* Keep the header (and the settings panel inside it) above the pinned controls */
 .site-header { position: relative; z-index: 5; }
+
+/* Brands and gear sets: three-column cards with the slider inside each card */
+.order-switch { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin: -4px 0 12px; font-size: 12px; color: var(--muted); }
+.segmented.small { width: 150px; }
+.segmented.small button { font-size: 12px; padding: 4px 0; }
+body.collection #list-view, body.collection .controls-inner { max-width: 60rem; }
+#items-grid.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.item-card { flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 14px; }
+.card-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.card-top h3 { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.2; min-width: 0; overflow-wrap: anywhere; }
+.item-card.done .card-top h3 { color: var(--accent); }
+.item-card .rank-wrap { width: 100%; }
+.item-card .item-icon { width: 40px; height: 40px; }
+@media (max-width: 860px) { #items-grid.cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { #items-grid.cards { grid-template-columns: 1fr; } }
