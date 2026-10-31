@@ -25,5 +25,8 @@ export const backpacks = [
     { id: "exg_memento", name: "Memento", variant: "Backpack", exotic: true },
     { id: "exg_ninjabike_messenger_backpack", name: "NinjaBike Messenger Backpack", variant: "Backpack", exotic: true },
     { id: "exg_harrier_pride", name: "Harrier Pride", variant: "Backpack", exotic: true },
-    { id: "improvised_backpack", name: "Improvised Backpack", variant: "Backpack", improvised: true }
+    { id: "improvised_backpack", name: "Improvised Backpack", variant: "Backpack", improvised: true },
+    { id: "ng_keeper", name: "Keeper", variant: "Backpack", named: true },
+    { id: "ng_melon_baller", name: "Melon Baller", variant: "Backpack", named: true },
+    { id: "exg_sarru", name: "Sarru", variant: "Backpack", exotic: true }
 ];

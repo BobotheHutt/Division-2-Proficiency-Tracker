@@ -24,7 +24,11 @@ export const bodyArmor = [
     { id: "exg_collector", name: "Collector", variant: "Body Armor", exotic: true },
     { id: "exg_provocator", name: "Provocator", variant: "Body Armor", exotic: true },
     { id: "exg_beacon", name: "Beacon", variant: "Body Armor", exotic: true },
-    { id: "exg_tardigrade_armor_system", name: "Tardigrade Armor System", variant: "Body Armor", exotic: true },
+    { id: "exg_tardigrade_armor_system", name: "\"Tardigrade\" Armor System", variant: "Body Armor", exotic: true },
     { id: "exg_ridgeway_s_pride", name: "Ridgeway's Pride", variant: "Body Armor", exotic: true },
-    { id: "improvised_body_armor", name: "Improvised Body Armor", variant: "Body Armor", improvised: true }
+    { id: "improvised_body_armor", name: "Improvised Body Armor", variant: "Body Armor", improvised: true },
+    { id: "ng_armadillo_vest", name: "Armadillo Vest", variant: "Body Armor", named: true },
+    { id: "exg_iron_will", name: "Iron Will", variant: "Body Armor", exotic: true },
+    { id: "ng_rushdown", name: "Rushdown", variant: "Body Armor", named: true },
+    { id: "ng_trick_shot", name: "Trick Shot", variant: "Body Armor", named: true }
 ];
