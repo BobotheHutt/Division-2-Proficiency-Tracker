@@ -247,34 +247,37 @@ function renderSummary() {
 
 const isCollectionTab = () => ui.tab === "brands" || ui.tab === "gearSets";
 
-// Sorting, like the in-game options. Brands and gear sets can also follow the in-game order (their data files' order).
+// Sorting. Weapons get the in-game weapon sorts; brands and gear sets can follow the in-game order (their data files'
+// order) or go A-Z. Other categories have their own in-game sorts, not added yet, so they stay sorted by name.
 // Plain character order (digits first, accented letters after z) to match the in-game list.
 const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
 const qualityOf = item => (item.exotic ? 2 : item.named ? 1 : 0);
 const SORTS = {
     game: { label: "Game", cmp: null },
     name: { label: "Name", cmp: byName },
+    az: { label: "A\u2013Z", cmp: byName },
     quality: { label: "Quality", cmp: (a, b) => qualityOf(b) - qualityOf(a) || byName(a, b) },
     prof: { label: "Proficiency", cmp: (a, b) => rankOf(b.id) - rankOf(a.id) || byName(a, b) },
     inv: { label: "Inverse", title: "Inverse proficiency: lowest rank first", cmp: (a, b) => rankOf(a.id) - rankOf(b.id) || byName(a, b) },
 };
-// Quality only shows where the category has named or exotic items.
+// Quality only shows where the category has named or exotic items (not Specialization).
 function sortChoices(items) {
-    if (isCollectionTab()) return ["game", "name", "prof", "inv"];
+    if (isCollectionTab()) return ["game", "az"];
+    if (ui.tab !== "weapons") return ["name"];
     return items.some(i => i.named || i.exotic) ? ["name", "quality", "prof", "inv"] : ["name", "prof", "inv"];
 }
 const sortKey = () => (isCollectionTab() ? "order" : "sort");
 function activeSort(items) {
     const choices = sortChoices(items);
-    const cur = ui[sortKey()] === "az" ? "name" : ui[sortKey()];
-    return choices.includes(cur) ? cur : choices[0];
+    return choices.includes(ui[sortKey()]) ? ui[sortKey()] : choices[0];
 }
 
 function renderListTools() {
     const el = document.getElementById("list-tools");
     const items = CATEGORIES[ui.tab].subs[activeSubKey()].items;
     const cur = activeSort(items);
-    el.hidden = false;
+    el.hidden = sortChoices(items).length < 2;
+    if (el.hidden) { el.innerHTML = ""; return; }
     el.innerHTML = `<div class="order-switch"><span>Sort</span>
         <div class="segmented small" role="group" aria-label="Sort">
             ${sortChoices(items).map(k => `<button type="button" data-sort="${k}" class="${k === cur ? "active" : ""}"${SORTS[k].title ? ` title="${SORTS[k].title}"` : ""}>${SORTS[k].label}</button>`).join("")}

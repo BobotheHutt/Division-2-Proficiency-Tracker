@@ -31,5 +31,6 @@ export const shotguns = [
     { id: "sg_six12", name: "Six12", variant: "Shotgun" },
     { id: "sg_the_mop", name: "The Mop", variant: "Shotgun", named: true },
     { id: "sg_scorpio", name: "Scorpio", variant: "Shotgun", exotic: true },
-    { id: "sg_fafnir", name: "Fafnir", variant: "Shotgun", exotic: true }
+    { id: "sg_fafnir", name: "Fafnir", variant: "Shotgun", exotic: true },
+    { id: "sg_inconspicuous", name: "Inconspicuous", variant: "Shotgun", named: true }
 ];
