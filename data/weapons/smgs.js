@@ -42,5 +42,6 @@ export const smgs = [
     { id: "smg_the_apartment", name: "The Apartment", variant: "SMG", named: true },
     { id: "smg_backfire", name: "Backfire", variant: "SMG", exotic: true },
     { id: "smg_old_glory", name: "Old Glory", variant: "SMG", named: true },
-    { id: "smg_underboss", name: "Underboss", variant: "SMG", exotic: true }
+    { id: "smg_underboss", name: "Underboss", variant: "SMG", exotic: true },
+    { id: "smg_clockwork", name: "Clockwork", variant: "SMG", named: true }
 ];

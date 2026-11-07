@@ -9,5 +9,7 @@ export const gloves = [
     { id: "exg_exodus_gloves", name: "Exodus Gloves", variant: "Gloves", exotic: true },
     { id: "exg_overdogs", name: "Overdogs", variant: "Gloves", exotic: true },
     { id: "exg_rugged_gauntlets", name: "Rugged Gauntlets", variant: "Gloves", exotic: true },
-    { id: "improvised_gloves", name: "Improvised Gloves", variant: "Gloves", improvised: true }
+    { id: "improvised_gloves", name: "Improvised Gloves", variant: "Gloves", improvised: true },
+    { id: "exg_loaded_for_bear", name: "Loaded for Bear", variant: "Gloves", exotic: true },
+    { id: "ng_specter_s_gloves", name: "Specter's Gloves", variant: "Gloves", named: true }
 ];

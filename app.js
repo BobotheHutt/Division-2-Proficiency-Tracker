@@ -94,7 +94,7 @@ function save(key, value) {
 
 // userProgress: { [itemId]: rank }
 let userProgress = load(STORAGE_KEY, {});
-const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game", mode: "tracker", planZero: false }, load(UI_KEY, {}));
+const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game", sort: "name", mode: "tracker", planZero: false }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 ui.view = ui.mode === "planner" ? "plan" : "hub"; // start on the page you used last
 ui.planSlot = null;
@@ -256,7 +256,19 @@ function renderSummary() {
 
 const isCollectionTab = () => ui.tab === "brands" || ui.tab === "gearSets";
 
-// Brands and gear sets can follow the in-game order (the order of their data files) or go A-Z.
+// Sorting, like the in-game options. Brands and gear sets instead follow the in-game order (their data files' order)
+// or go A-Z; their in-game sorts (Name, Grade, Level) are about your inventory, so they don't apply here.
+const qualityOf = item => (item.exotic ? 2 : item.named ? 1 : 0);
+const SORTS = {
+    name: { label: "Name", cmp: (a, b) => byName(a, b) },
+    quality: { label: "Quality", cmp: (a, b) => qualityOf(b) - qualityOf(a) || byName(a, b) },
+    prof: { label: "Proficiency", cmp: (a, b) => rankOf(b.id) - rankOf(a.id) || byName(a, b) },
+    inv: { label: "Inverse", title: "Inverse proficiency: lowest rank first", cmp: (a, b) => rankOf(a.id) - rankOf(b.id) || byName(a, b) },
+};
+// Quality only shows where the category has named or exotic items (not Specialization or skills).
+const sortChoices = items => (items.some(i => i.named || i.exotic) ? ["name", "quality", "prof", "inv"] : ["name", "prof", "inv"]);
+const activeSort = items => (sortChoices(items).includes(ui.sort) ? ui.sort : "name");
+
 function renderListTools() {
     const el = document.getElementById("list-tools");
     if (ui.view === "planlist") {
@@ -264,8 +276,17 @@ function renderListTools() {
         el.innerHTML = `<div class="order-switch">${planZeroToggle()}</div>`;
         return;
     }
-    el.hidden = ui.view !== "list" || !isCollectionTab();
+    el.hidden = ui.view !== "list";
     if (el.hidden) { el.innerHTML = ""; return; }
+    if (!isCollectionTab()) {
+        const items = CATEGORIES[ui.tab].subs[activeSubKey()].items;
+        const cur = activeSort(items);
+        el.innerHTML = `<div class="order-switch"><span>Sort</span>
+            <div class="segmented small" role="group" aria-label="Sort">
+                ${sortChoices(items).map(k => `<button type="button" data-sort="${k}" class="${k === cur ? "active" : ""}"${SORTS[k].title ? ` title="${SORTS[k].title}"` : ""}>${SORTS[k].label}</button>`).join("")}
+            </div></div>`;
+        return;
+    }
     el.innerHTML = `<div class="order-switch"><span>Order</span>
         <div class="segmented small" role="group" aria-label="Order">
             <button type="button" data-order="game" class="${ui.order === "game" ? "active" : ""}">Game</button>
@@ -308,8 +329,8 @@ function renderItems() {
     const isCollection = isCollectionTab();
     grid.classList.toggle("cards", isCollection);
     const shown = sub.items.filter(visible);
-    // Brands and gear sets can follow the game's order; everything else is A-Z in plain character order.
-    const items = isCollection && ui.order === "game" ? shown : shown.sort(byName);
+    // Brands and gear sets can follow the game's order or go A-Z; everything else uses the chosen sort.
+    const items = isCollection ? (ui.order === "game" ? shown : shown.sort(byName)) : shown.sort(SORTS[activeSort(sub.items)].cmp);
 
     if (!items.length) {
         const elsewhere = countVisible(allItems());
@@ -529,6 +550,14 @@ document.addEventListener("change", e => {
 });
 
 document.addEventListener("click", e => {
+    const srt = e.target.closest("[data-sort]");
+    if (srt) {
+        ui.sort = srt.dataset.sort;
+        save(UI_KEY, ui);
+        renderListTools();
+        renderItems();
+        return;
+    }
     const ord = e.target.closest("[data-order]");
     if (ord) {
         ui.order = ord.dataset.order;
