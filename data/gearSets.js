@@ -19,6 +19,7 @@ export const gearSets = [
     { id: "set_future_initiative", name: "Future Initiative", variant: "Gear Set" },
     { id: "set_foundry_bulwark", name: "Foundry Bulwark", variant: "Gear Set" },
     { id: "set_system_corruption", name: "System Corruption", variant: "Gear Set" },
+    { id: "set_apex_protocol", name: "Apex Protocol", variant: "Gear Set" },
     { id: "set_ember_engine", name: "Ember Engine", variant: "Gear Set" },
     { id: "set_ortiz_reficere", name: "Ortiz: Reficere", variant: "Gear Set" },
     { id: "set_aces_eights", name: "Aces & Eights", variant: "Gear Set" },
@@ -26,6 +27,5 @@ export const gearSets = [
     { id: "set_negotiator_s_dilemma", name: "Negotiator's Dilemma", variant: "Gear Set" },
     { id: "set_hard_wired", name: "Hard Wired", variant: "Gear Set" },
     { id: "set_true_patriot", name: "True Patriot", variant: "Gear Set" },
-    { id: "set_ongoing_directive", name: "Ongoing Directive", variant: "Gear Set" },
-    { id: "set_apex_protocol", name: "Apex Protocol", variant: "Gear Set" }
+    { id: "set_ongoing_directive", name: "Ongoing Directive", variant: "Gear Set" }
 ];
