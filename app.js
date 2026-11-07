@@ -247,8 +247,8 @@ function renderSummary() {
 
 const isCollectionTab = () => ui.tab === "brands" || ui.tab === "gearSets";
 
-// Sorting. Weapons get the in-game weapon sorts; brands and gear sets can follow the in-game order (their data files'
-// order) or go A-Z. Other categories have their own in-game sorts, not added yet, so they stay sorted by name.
+// Sorting, like the in-game options. Brands and gear sets instead follow the in-game order (their data files' order)
+// or go A-Z; their in-game sorts (Name, Grade, Level) are about your inventory, so they don't apply here.
 // Plain character order (digits first, accented letters after z) to match the in-game list.
 const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
 const qualityOf = item => (item.exotic ? 2 : item.named ? 1 : 0);
@@ -260,10 +260,9 @@ const SORTS = {
     prof: { label: "Proficiency", cmp: (a, b) => rankOf(b.id) - rankOf(a.id) || byName(a, b) },
     inv: { label: "Inverse", title: "Inverse proficiency: lowest rank first", cmp: (a, b) => rankOf(a.id) - rankOf(b.id) || byName(a, b) },
 };
-// Quality only shows where the category has named or exotic items (not Specialization).
+// Quality only shows where the category has named or exotic items (not Specialization or skills).
 function sortChoices(items) {
     if (isCollectionTab()) return ["game", "az"];
-    if (ui.tab !== "weapons") return ["name"];
     return items.some(i => i.named || i.exotic) ? ["name", "quality", "prof", "inv"] : ["name", "prof", "inv"];
 }
 const sortKey = () => (isCollectionTab() ? "order" : "sort");
