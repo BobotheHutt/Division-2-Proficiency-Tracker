@@ -829,29 +829,91 @@ applyBg();
 showBgImage(null);
 bgStore.get().then(blob => { if (blob) showBgImage(blob); }).catch(() => {});
 
-// --- Profile selector (next to the Google email) ---
+// --- Profiles: quick switcher next to the Google email, full management in a popup from Settings ---
 const profileBtn = document.getElementById("profile-btn");
 const profileMenu = document.getElementById("profile-menu");
+const profilesDialog = document.getElementById("profiles-dialog");
+const profilesList = document.getElementById("profiles-list");
+const addForm = document.getElementById("profile-add-form");
+const addName = document.getElementById("profile-add-name");
+let renaming = null; // id of the profile being renamed in the popup
+let menuAdding = false; // the dropdown's "Add profile" turned into a name field
+
+const NAME_MAX = 24;
+const cleanName = n => String(n || "").trim().slice(0, NAME_MAX);
+const newProfileId = () => `p${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+const profileById = id => profiles.list.find(p => p.id === id);
+const progressOf = id => (id === profiles.active ? { ...userProgress } : load(progressKey(id), {}));
+
+// Push one profile to the cloud (the active one goes through the normal debounced save).
+function syncProfile(id) {
+    if (!currentUser) return;
+    if (id === profiles.active) { persist(); return; }
+    const p = profileById(id);
+    setSyncStatus("Saving...");
+    saveProfile(currentUser.uid, id, p.name, progressOf(id))
+        .then(() => setSyncStatus("Synced"))
+        .catch(err => { console.error(err); setSyncStatus("Sync failed"); });
+}
 
 function renderProfiles() {
     document.getElementById("profile-name").textContent = activeProfile().name;
-    const isMain = profiles.active === "main";
+    document.getElementById("settings-profile").textContent = activeProfile().name;
     profileMenu.innerHTML = `<div class="menu-title">Profiles</div>
         ${profiles.list.map(p => `<button type="button" role="menuitemradio" aria-checked="${p.id === profiles.active}" class="menu-item ${p.id === profiles.active ? "active" : ""}" data-profile="${esc(p.id)}">
-            <span class="menu-check" aria-hidden="true">${p.id === profiles.active ? "\u2713" : ""}</span>${esc(p.name)}</button>`).join("")}
+            <span class="menu-check" aria-hidden="true">${p.id === profiles.active ? "✓" : ""}</span>${esc(p.name)}</button>`).join("")}
         <div class="menu-sep"></div>
-        <button type="button" role="menuitem" class="menu-item" data-profile-action="add"><span class="menu-check" aria-hidden="true">+</span>Add profile</button>
-        <button type="button" role="menuitem" class="menu-item" data-profile-action="rename"><span class="menu-check"></span>Rename \u201c${esc(activeProfile().name)}\u201d</button>
-        ${isMain ? "" : `<button type="button" role="menuitem" class="menu-item danger" data-profile-action="delete"><span class="menu-check"></span>Delete \u201c${esc(activeProfile().name)}\u201d</button>`}`;
+        ${menuAdding
+            ? `<form class="menu-add" id="menu-add-form">
+                   <input type="text" class="text-input" maxlength="${NAME_MAX}" placeholder="Profile name" aria-label="New profile name" required>
+                   <button type="submit" class="btn small primary">Add</button>
+               </form>`
+            : `<button type="button" role="menuitem" class="menu-item" data-profile-action="add"><span class="menu-check" aria-hidden="true">+</span>Add profile</button>`}`;
+    if (menuAdding) profileMenu.querySelector("input").focus();
+    if (profilesDialog.open) renderProfilesDialog();
+}
+
+function renderProfilesDialog() {
+    profilesList.innerHTML = profiles.list.map(p => {
+        const on = p.id === profiles.active;
+        const done = Object.values(progressOf(p.id)).filter(r => r >= MAX_RANK).length;
+        const name = renaming === p.id
+            ? `<form class="rename-form" data-rename-form="${esc(p.id)}">
+                   <input type="text" class="text-input" maxlength="${NAME_MAX}" value="${esc(p.name)}" aria-label="New name for ${esc(p.name)}" required>
+                   <button type="submit" class="btn small primary">Save</button>
+                   <button type="button" class="btn small" data-pm="cancel">Cancel</button>
+               </form>`
+            : `<div class="profile-name-line"><b>${esc(p.name)}</b>${on ? `<span class="tag">Active</span>` : ""}<span class="muted tiny">${done} proficient</span></div>`;
+        return `<li class="profile-row ${on ? "active" : ""}" data-id="${esc(p.id)}">
+            ${name}
+            ${renaming === p.id ? "" : `<div class="profile-actions">
+                ${on ? "" : `<button type="button" class="btn small" data-pm="use">Switch</button>`}
+                <button type="button" class="btn small" data-pm="rename">Rename</button>
+                <button type="button" class="btn small" data-pm="duplicate">Duplicate</button>
+                ${p.id === "main" ? "" : `<button type="button" class="btn small danger" data-pm="delete">Delete</button>`}
+            </div>`}
+        </li>`;
+    }).join("");
+    const input = profilesList.querySelector(".rename-form input");
+    if (input) { input.focus(); input.select(); }
+}
+
+function openProfilesDialog() {
+    setPanel(false);
+    setProfileMenu(false);
+    renaming = null;
+    renderProfilesDialog();
+    profilesDialog.showModal();
 }
 
 function setProfileMenu(open) {
+    if (!open && menuAdding) { menuAdding = false; renderProfiles(); }
     profileMenu.hidden = !open;
     profileBtn.setAttribute("aria-expanded", String(open));
 }
 
 async function switchProfile(id) {
-    if (id === profiles.active || !profiles.list.some(p => p.id === id)) return;
+    if (id === profiles.active || !profileById(id)) return;
     await flushSave();
     profiles.active = id;
     save(PROFILES_KEY, profiles);
@@ -860,37 +922,43 @@ async function switchProfile(id) {
     renderAll();
 }
 
-const askName = (msg, current = "") => {
-    const n = (prompt(msg, current) || "").trim().slice(0, 24);
-    return n || null;
-};
+function addProfile(name, progress = {}, after = null) {
+    const id = newProfileId();
+    const at = after ? profiles.list.findIndex(p => p.id === after) + 1 : profiles.list.length;
+    profiles.list.splice(at, 0, { id, name });
+    save(PROFILES_KEY, profiles);
+    save(progressKey(id), progress);
+    syncProfile(id);
+    return id;
+}
 
-async function profileAction(action) {
-    const cur = activeProfile();
-    if (action === "add") {
-        const name = askName("Name for the new profile (for example your alt):");
-        if (!name) return;
-        const id = `p${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-        profiles.list.push({ id, name });
-        save(PROFILES_KEY, profiles);
-        await switchProfile(id);
-        persist();
-    } else if (action === "rename") {
-        const name = askName("Rename this profile:", cur.name);
-        if (!name) return;
-        cur.name = name;
-        save(PROFILES_KEY, profiles);
-        renderProfiles();
-        persist();
-    } else if (action === "delete" && cur.id !== "main") {
-        if (!confirm(`Delete the profile "${cur.name}" and all of its progress? This can't be undone.`)) return;
-        pendingSave = null;
-        clearTimeout(syncTimer);
-        profiles.list = profiles.list.filter(p => p.id !== cur.id);
-        try { localStorage.removeItem(progressKey(cur.id)); } catch { /* storage unavailable */ }
-        await switchProfile("main");
-        if (currentUser) deleteProfile(currentUser.uid, cur.id).catch(err => { console.error(err); setSyncStatus("Sync failed"); });
-    }
+function renameProfile(id, name) {
+    const p = profileById(id);
+    if (!p || !name) return;
+    p.name = name;
+    save(PROFILES_KEY, profiles);
+    syncProfile(id);
+    renderProfiles();
+}
+
+function duplicateProfile(id) {
+    const src = profileById(id);
+    const name = cleanName(`${src.name} (copy)`);
+    addProfile(name, progressOf(id), id);
+    renderProfiles();
+}
+
+async function removeProfile(id) {
+    const p = profileById(id);
+    if (!p || id === "main") return;
+    if (!confirm(`Delete the profile "${p.name}" and all of its progress? This can't be undone.`)) return;
+    if (id === profiles.active) { pendingSave = null; clearTimeout(syncTimer); await switchProfile("main"); }
+    if (pendingSave?.id === id) pendingSave = null;
+    profiles.list = profiles.list.filter(x => x.id !== id);
+    save(PROFILES_KEY, profiles);
+    try { localStorage.removeItem(progressKey(id)); } catch { /* storage unavailable */ }
+    if (currentUser) deleteProfile(currentUser.uid, id).catch(err => { console.error(err); setSyncStatus("Sync failed"); });
+    renderProfiles();
 }
 
 profileBtn.addEventListener("click", () => setProfileMenu(profileMenu.hidden));
@@ -898,15 +966,63 @@ profileMenu.addEventListener("click", e => {
     const p = e.target.closest("[data-profile]");
     const a = e.target.closest("[data-profile-action]");
     if (!p && !a) return;
+    if (a) { menuAdding = true; renderProfiles(); return; }
     setProfileMenu(false);
-    if (p) switchProfile(p.dataset.profile);
-    else profileAction(a.dataset.profileAction);
+    switchProfile(p.dataset.profile);
+});
+// Adding from the dropdown switches straight to the new profile.
+profileMenu.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = cleanName(e.target.querySelector("input").value);
+    if (!name) return;
+    const id = addProfile(name);
+    setProfileMenu(false);
+    switchProfile(id);
 });
 document.addEventListener("click", e => {
-    if (!profileMenu.hidden && !e.target.closest(".profile-select")) setProfileMenu(false);
+    // composedPath, not closest: the menu re-renders on click, which detaches the clicked element.
+    if (!profileMenu.hidden && !e.composedPath().some(el => el.classList?.contains("profile-select"))) setProfileMenu(false);
 });
 document.addEventListener("keydown", e => {
     if (e.key === "Escape" && !profileMenu.hidden) { setProfileMenu(false); profileBtn.focus(); }
+});
+
+document.getElementById("manage-profiles-btn").addEventListener("click", () => openProfilesDialog());
+document.getElementById("profiles-close").addEventListener("click", () => profilesDialog.close());
+profilesDialog.addEventListener("click", e => { if (e.target === profilesDialog) profilesDialog.close(); }); // click outside
+profilesDialog.addEventListener("close", () => { renaming = null; addName.value = ""; });
+// Esc while renaming only cancels the rename, not the whole popup.
+profilesDialog.addEventListener("cancel", e => {
+    if (renaming) { e.preventDefault(); renaming = null; renderProfilesDialog(); }
+});
+
+profilesList.addEventListener("click", e => {
+    const b = e.target.closest("[data-pm]");
+    if (!b) return;
+    const id = b.closest(".profile-row").dataset.id;
+    const act = b.dataset.pm;
+    if (act === "use") switchProfile(id).then(renderProfilesDialog);
+    else if (act === "rename") { renaming = id; renderProfilesDialog(); }
+    else if (act === "cancel") { renaming = null; renderProfilesDialog(); }
+    else if (act === "duplicate") duplicateProfile(id);
+    else if (act === "delete") removeProfile(id);
+});
+profilesList.addEventListener("submit", e => {
+    const f = e.target.closest("[data-rename-form]");
+    if (!f) return;
+    e.preventDefault();
+    const name = cleanName(f.querySelector("input").value);
+    renaming = null;
+    if (name) renameProfile(f.dataset.renameForm, name);
+    else renderProfilesDialog();
+});
+addForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = cleanName(addName.value);
+    if (!name) { addName.focus(); return; }
+    addName.value = "";
+    addProfile(name);
+    renderProfiles();
 });
 renderProfiles();
 

@@ -568,3 +568,38 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
     #account-email { display: none; }
 }
 @media (max-width: 360px) { .profile-btn { max-width: 64px; } .header-actions { gap: 4px; } }
+
+/* Add-profile field inside the header dropdown */
+.menu-add { display: flex; gap: 6px; padding: 4px; }
+.menu-add .text-input { flex: 1; min-width: 0; }
+
+/* Manage profiles popup (Settings) */
+.text-input {
+    padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2);
+    color: var(--text); font: inherit; font-size: 13px;
+}
+.text-input:focus { outline: none; border-color: var(--accent); }
+.btn.small { padding: 5px 10px; font-size: 12px; }
+.modal {
+    width: min(460px, calc(100vw - 32px)); max-height: calc(100vh - 64px); padding: 18px; border-radius: 14px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+}
+.modal::backdrop { background: rgba(0, 0, 0, .55); }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.modal-head h2 { margin: 0; font-size: 16px; }
+.modal > p { margin: 0 0 14px; font-size: 13px; }
+.profiles-list { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.profile-row { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.profile-row.active { border-color: var(--accent); }
+.profile-name-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.profile-name-line b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-name-line .muted { margin-left: auto; white-space: nowrap; }
+.tag { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); }
+.profile-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.rename-form { display: flex; gap: 6px; }
+.rename-form .text-input { flex: 1; min-width: 0; }
+.profile-add { display: flex; gap: 8px; }
+.profile-add .text-input { flex: 1; min-width: 0; }
+.profile-actions .btn.small { padding: 5px 9px; }
+.profile-actions .danger { margin-left: auto; }
+@media (max-width: 400px) { .profile-actions { gap: 5px; } .profile-actions .btn.small { padding: 5px 8px; } }

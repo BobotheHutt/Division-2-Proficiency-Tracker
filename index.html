@@ -63,6 +63,11 @@
                             <button type="button" class="btn full" data-auth id="panel-auth">Sign in with Google</button>
                         </section>
                         <section>
+                            <h2>Profiles</h2>
+                            <p class="muted">Active profile: <b id="settings-profile">Main</b>. Each profile keeps its own progress, for example for an alt account.</p>
+                            <button type="button" class="btn full" id="manage-profiles-btn">Manage profiles</button>
+                        </section>
+                        <section>
                             <h2>Appearance</h2>
                             <div class="segmented" id="theme-options" role="group" aria-label="Theme">
                                 <button type="button" data-theme-choice="dark">Dark</button>
@@ -156,6 +161,21 @@
         </div>
     </main>
 
+
+    <dialog id="profiles-dialog" class="modal" aria-labelledby="profiles-title">
+        <div class="modal-head">
+            <h2 id="profiles-title">Profiles</h2>
+            <button type="button" class="icon-btn" id="profiles-close" aria-label="Close">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+        </div>
+        <p class="muted">Each profile keeps its own progress, for example for an alt account. Your first profile can be renamed but not deleted.</p>
+        <ul id="profiles-list" class="profiles-list"></ul>
+        <form id="profile-add-form" class="profile-add">
+            <input type="text" id="profile-add-name" class="text-input" maxlength="24" placeholder="New profile name" aria-label="New profile name">
+            <button type="submit" class="btn primary">Add profile</button>
+        </form>
+    </dialog>
 
     <script type="module" src="app.js"></script>
 </body>
