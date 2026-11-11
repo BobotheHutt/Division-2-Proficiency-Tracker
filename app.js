@@ -28,7 +28,7 @@ import { brands } from "./data/brands.js";
 import { gearSets } from "./data/gearSets.js";
 
 import { glyph } from "./icons.js";
-import { cloudEnabled, initCloud, signIn, signOut, loadProgress, saveProgress } from "./cloud.js";
+import { cloudEnabled, initCloud, signIn, signOut, loadProfiles, saveProfile, deleteProfile } from "./cloud.js";
 
 const MAX_RANK = 10;
 const STORAGE_KEY = "d2-proficiency-progress";
@@ -92,8 +92,17 @@ function save(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ }
 }
 
-// userProgress: { [itemId]: rank }
-let userProgress = load(STORAGE_KEY, {});
+// Profiles: separate progress for each game account (e.g. a main and an alt) under one sign-in.
+// "main" keeps the original storage key so existing progress stays where it was.
+const PROFILES_KEY = "d2-proficiency-profiles";
+const progressKey = id => (id === "main" ? STORAGE_KEY : `${STORAGE_KEY}:${id}`);
+let profiles = load(PROFILES_KEY, null);
+if (!profiles?.list?.some(p => p.id === "main")) profiles = { active: "main", list: [{ id: "main", name: "Main" }, ...(profiles?.list || [])] };
+if (!profiles.list.some(p => p.id === profiles.active)) profiles.active = "main";
+const activeProfile = () => profiles.list.find(p => p.id === profiles.active);
+
+// userProgress: { [itemId]: rank } for the active profile
+let userProgress = load(progressKey(profiles.active), {});
 const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game", sort: "name", mode: "tracker", planZero: false }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 ui.view = ui.mode === "planner" ? "plan" : "hub"; // start on the page you used last
@@ -142,15 +151,23 @@ function setSyncStatus(text) {
     chip.title = [currentUser?.email, text].filter(Boolean).join(" \u00b7 ");
 }
 
+let pendingSave = null;
+async function flushSave() {
+    clearTimeout(syncTimer);
+    const job = pendingSave;
+    pendingSave = null;
+    if (!job || !currentUser) return;
+    try { await saveProfile(currentUser.uid, job.id, job.name, job.progress); setSyncStatus("Synced"); }
+    catch (err) { console.error(err); setSyncStatus("Sync failed"); }
+}
+
 function persist() {
-    save(STORAGE_KEY, userProgress);
+    save(progressKey(profiles.active), userProgress);
     if (!currentUser) return;
     setSyncStatus("Saving...");
+    pendingSave = { id: profiles.active, name: activeProfile().name, progress: { ...userProgress } };
     clearTimeout(syncTimer);
-    syncTimer = setTimeout(async () => {
-        try { await saveProgress(currentUser.uid, userProgress); setSyncStatus("Synced"); }
-        catch (err) { console.error(err); setSyncStatus("Sync failed"); }
-    }, 800);
+    syncTimer = setTimeout(flushSave, 800);
 }
 
 function setRank(id, rank) {
@@ -635,7 +652,7 @@ document.getElementById("export-btn").addEventListener("click", () => {
     const blob = new Blob([JSON.stringify(userProgress, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "division2-progress.json";
+    a.download = `division2-progress-${activeProfile().name.replace(/[^\w-]+/g, "_")}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
 });
@@ -812,6 +829,87 @@ applyBg();
 showBgImage(null);
 bgStore.get().then(blob => { if (blob) showBgImage(blob); }).catch(() => {});
 
+// --- Profile selector (next to the Google email) ---
+const profileBtn = document.getElementById("profile-btn");
+const profileMenu = document.getElementById("profile-menu");
+
+function renderProfiles() {
+    document.getElementById("profile-name").textContent = activeProfile().name;
+    const isMain = profiles.active === "main";
+    profileMenu.innerHTML = `<div class="menu-title">Profiles</div>
+        ${profiles.list.map(p => `<button type="button" role="menuitemradio" aria-checked="${p.id === profiles.active}" class="menu-item ${p.id === profiles.active ? "active" : ""}" data-profile="${esc(p.id)}">
+            <span class="menu-check" aria-hidden="true">${p.id === profiles.active ? "\u2713" : ""}</span>${esc(p.name)}</button>`).join("")}
+        <div class="menu-sep"></div>
+        <button type="button" role="menuitem" class="menu-item" data-profile-action="add"><span class="menu-check" aria-hidden="true">+</span>Add profile</button>
+        <button type="button" role="menuitem" class="menu-item" data-profile-action="rename"><span class="menu-check"></span>Rename \u201c${esc(activeProfile().name)}\u201d</button>
+        ${isMain ? "" : `<button type="button" role="menuitem" class="menu-item danger" data-profile-action="delete"><span class="menu-check"></span>Delete \u201c${esc(activeProfile().name)}\u201d</button>`}`;
+}
+
+function setProfileMenu(open) {
+    profileMenu.hidden = !open;
+    profileBtn.setAttribute("aria-expanded", String(open));
+}
+
+async function switchProfile(id) {
+    if (id === profiles.active || !profiles.list.some(p => p.id === id)) return;
+    await flushSave();
+    profiles.active = id;
+    save(PROFILES_KEY, profiles);
+    userProgress = load(progressKey(id), {});
+    renderProfiles();
+    renderAll();
+}
+
+const askName = (msg, current = "") => {
+    const n = (prompt(msg, current) || "").trim().slice(0, 24);
+    return n || null;
+};
+
+async function profileAction(action) {
+    const cur = activeProfile();
+    if (action === "add") {
+        const name = askName("Name for the new profile (for example your alt):");
+        if (!name) return;
+        const id = `p${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+        profiles.list.push({ id, name });
+        save(PROFILES_KEY, profiles);
+        await switchProfile(id);
+        persist();
+    } else if (action === "rename") {
+        const name = askName("Rename this profile:", cur.name);
+        if (!name) return;
+        cur.name = name;
+        save(PROFILES_KEY, profiles);
+        renderProfiles();
+        persist();
+    } else if (action === "delete" && cur.id !== "main") {
+        if (!confirm(`Delete the profile "${cur.name}" and all of its progress? This can't be undone.`)) return;
+        pendingSave = null;
+        clearTimeout(syncTimer);
+        profiles.list = profiles.list.filter(p => p.id !== cur.id);
+        try { localStorage.removeItem(progressKey(cur.id)); } catch { /* storage unavailable */ }
+        await switchProfile("main");
+        if (currentUser) deleteProfile(currentUser.uid, cur.id).catch(err => { console.error(err); setSyncStatus("Sync failed"); });
+    }
+}
+
+profileBtn.addEventListener("click", () => setProfileMenu(profileMenu.hidden));
+profileMenu.addEventListener("click", e => {
+    const p = e.target.closest("[data-profile]");
+    const a = e.target.closest("[data-profile-action]");
+    if (!p && !a) return;
+    setProfileMenu(false);
+    if (p) switchProfile(p.dataset.profile);
+    else profileAction(a.dataset.profileAction);
+});
+document.addEventListener("click", e => {
+    if (!profileMenu.hidden && !e.target.closest(".profile-select")) setProfileMenu(false);
+});
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !profileMenu.hidden) { setProfileMenu(false); profileBtn.focus(); }
+});
+renderProfiles();
+
 // --- Accounts (optional; the tracker works locally without signing in) ---
 const authButtons = document.querySelectorAll("[data-auth]");
 const cloudParts = document.querySelectorAll(".needs-cloud");
@@ -835,14 +933,27 @@ async function onUserChange(user) {
     if (!user) { setSyncStatus(""); return; }
     setSyncStatus("Syncing...");
     try {
-        // On sign-in, keep the higher rank per item from local and cloud.
-        const cloud = await loadProgress(user.uid);
-        const merged = { ...cloud };
-        for (const [id, rank] of Object.entries(userProgress)) merged[id] = Math.max(rank, merged[id] || 0);
-        userProgress = merged;
-        save(STORAGE_KEY, userProgress);
-        await saveProgress(user.uid, userProgress);
+        // On sign-in, combine this browser's profiles with the cloud's: same profile -> keep the higher rank per item.
+        // Cloud names win (renames on another device); profiles deleted elsewhere are dropped here too.
+        const cloud = await loadProfiles(user.uid);
+        const list = profiles.list.filter(p => !cloud.deleted[p.id]);
+        for (const [id, c] of Object.entries(cloud.profiles)) {
+            const p = list.find(x => x.id === id);
+            if (p) { if (c.name) p.name = c.name; }
+            else list.push({ id, name: c.name || "Profile" });
+        }
+        profiles.list = list;
+        if (!list.some(p => p.id === profiles.active)) profiles.active = "main";
+        for (const p of list) {
+            const merged = { ...(cloud.profiles[p.id]?.progress || {}) };
+            for (const [id, rank] of Object.entries(load(progressKey(p.id), {}))) merged[id] = Math.max(rank, merged[id] || 0);
+            save(progressKey(p.id), merged);
+            await saveProfile(user.uid, p.id, p.name, merged);
+        }
+        save(PROFILES_KEY, profiles);
+        userProgress = load(progressKey(profiles.active), {});
         setSyncStatus("Synced");
+        renderProfiles();
         renderAll();
     } catch (err) {
         console.error(err);

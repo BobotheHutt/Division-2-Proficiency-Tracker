@@ -44,6 +44,13 @@
                     <i class="sync-dot" aria-hidden="true"></i>
                     <span id="account-email"></span>
                 </span>
+                <div class="profile-select">
+                    <button type="button" class="profile-btn" id="profile-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="profile-menu" title="Switch profile">
+                        <span id="profile-name">Main</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="profile-menu" id="profile-menu" role="menu" hidden></div>
+                </div>
                 <button type="button" class="btn primary needs-cloud" data-auth id="header-signin" hidden>Sign in</button>
                 <div class="settings">
                     <button type="button" class="icon-btn" id="settings-btn" aria-label="Settings" aria-expanded="false" aria-controls="settings-panel">

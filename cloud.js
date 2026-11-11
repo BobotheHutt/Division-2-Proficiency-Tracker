@@ -29,10 +29,25 @@ export async function initCloud(onUser) {
 export const signIn = () => fb.signInWithPopup(auth, new fb.GoogleAuthProvider());
 export const signOut = () => fb.signOut(auth);
 
-export async function loadProgress(uid) {
-    const snap = await fb.get(fb.ref(db, `users/${uid}/progress`));
-    return snap.exists() ? snap.val() : {};
+// Layout under users/{uid}:
+//   progress, mainName       the "main" profile (kept at the original path so older saves still load)
+//   profiles/{id}            other profiles: { name, progress, updatedAt }
+//   deleted/{id}: true       profiles removed on another device, so they aren't re-uploaded
+export async function loadProfiles(uid) {
+    const snap = await fb.get(fb.ref(db, `users/${uid}`));
+    const v = snap.exists() ? snap.val() : {};
+    const profiles = { main: { name: v.mainName || "", progress: v.progress || {} } };
+    for (const [id, a] of Object.entries(v.profiles || {})) profiles[id] = { name: a.name || "", progress: a.progress || {} };
+    return { profiles, deleted: v.deleted || {} };
 }
 
-export const saveProgress = (uid, progress) =>
-    fb.set(fb.ref(db, `users/${uid}`), { progress, updatedAt: Date.now() });
+// Writes only this profile's own paths, so the other profiles are left alone.
+export function saveProfile(uid, id, name, progress) {
+    const now = Date.now();
+    return id === "main"
+        ? fb.update(fb.ref(db, `users/${uid}`), { progress, mainName: name, updatedAt: now })
+        : fb.set(fb.ref(db, `users/${uid}/profiles/${id}`), { name, progress, updatedAt: now });
+}
+
+export const deleteProfile = (uid, id) =>
+    fb.update(fb.ref(db, `users/${uid}`), { [`profiles/${id}`]: null, [`deleted/${id}`]: true });
