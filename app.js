@@ -314,7 +314,7 @@ function renderListTools() {
 const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
 
 // Rarity drives each item's color (border, icon, bar) on the Tracker and Planner, like the game:
-// exotic red, named gold, high-end amber (regular weapons and brands), gear sets green. Skills and
+// exotic red, named and high-end gold (named also get a gold name), gear sets green. Skills and
 // specialization weapons have no rarity and keep their section's color.
 function rarityOf(item, tab, sub) {
     if (item.exotic) return "exotic";

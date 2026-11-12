@@ -10,7 +10,7 @@
     --accent-soft: rgba(249, 115, 22, .14);
     --named: #ffbe15;
     --exotic: #ef4a3a;
-    --highend: #ff9f1c;
+    --highend: var(--named);
     --gearset: #4ade80;
     --danger: #f87171;
     --shadow: 0 12px 32px rgba(0, 0, 0, .5);
@@ -28,7 +28,7 @@
     --accent-soft: rgba(234, 88, 12, .1);
     --named: #c98a00;
     --exotic: #d63a2b;
-    --highend: #c2620a;
+    --highend: var(--named);
     --gearset: #16a34a;
     --danger: #dc2626;
     --shadow: 0 12px 32px rgba(0, 0, 0, .14);
@@ -604,15 +604,14 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 @media (max-width: 400px) { .profile-actions { gap: 5px; } .profile-actions .btn.small { padding: 5px 8px; } }
 
 /* Rarity colors (Tracker rows and Planner cards). They replace the section color on that item:
-   border, icon, progress bar and checkbox all follow --accent. Names: exotic red, named gold, others plain. */
+   border, icon, progress bar and checkbox all follow --accent. Named and high-end share the gold; only
+   named items also get a gold name. Names: exotic red, named gold, others plain. */
 [data-rarity="exotic"]  { --accent: var(--exotic);  --accent-ink: #fff;    --accent-soft: color-mix(in srgb, var(--exotic) 15%, transparent); }
 [data-rarity="named"]   { --accent: var(--named);   --accent-ink: #1c1300; --accent-soft: color-mix(in srgb, var(--named) 15%, transparent); }
 [data-rarity="highend"],
-[data-rarity="brand"]   { --accent: var(--highend); --accent-ink: #1a0d00; --accent-soft: color-mix(in srgb, var(--highend) 15%, transparent); }
+[data-rarity="brand"]   { --accent: var(--highend); --accent-ink: #1c1300; --accent-soft: color-mix(in srgb, var(--highend) 15%, transparent); }
 [data-rarity="set"]     { --accent: var(--gearset); --accent-ink: #031a0c; --accent-soft: color-mix(in srgb, var(--gearset) 15%, transparent); }
 :root[data-theme="light"] [data-rarity="exotic"],
-:root[data-theme="light"] [data-rarity="highend"],
-:root[data-theme="light"] [data-rarity="brand"],
 :root[data-theme="light"] [data-rarity="set"] { --accent-ink: #fff; }
 .item-row[data-rarity]:not([data-rarity=""]) {
     border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
