@@ -313,6 +313,18 @@ function renderListTools() {
 
 const byName = (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : 0);
 
+// Rarity drives each item's color (border, icon, bar) on the Tracker and Planner, like the game:
+// exotic red, named gold, high-end amber (regular weapons and brands), gear sets green. Skills and
+// specialization weapons have no rarity and keep their section's color.
+function rarityOf(item, tab, sub) {
+    if (item.exotic) return "exotic";
+    if (item.named) return "named";
+    if (tab === "gearSets") return "set";
+    if (tab === "brands") return "brand";
+    if (tab === "weapons" && sub !== "specialization") return "highend";
+    return "";
+}
+
 // One list row (or card) for an item; also used by the Planner's progress list.
 function itemMarkup(item, tab, sub, asCard, subLabel = "") {
     const rank = rankOf(item.id);
@@ -328,12 +340,12 @@ function itemMarkup(item, tab, sub, asCard, subLabel = "") {
             <span class="rank-value"><b>${rank}</b>/${MAX_RANK}</span>
         </div>`;
     if (asCard) {
-        return `<div class="item-row item-card ${flags}" data-id="${esc(item.id)}" data-tone="${toneOf(tab)}">
+        return `<div class="item-row item-card ${flags}" data-id="${esc(item.id)}" data-tone="${toneOf(tab)}" data-rarity="${rarityOf(item, tab, sub)}">
         <div class="card-top">${check}${badge}<h3>${esc(item.name)}</h3></div>
         ${slider}
     </div>`;
     }
-    return `<div class="item-row ${flags}" data-id="${esc(item.id)}" data-tone="${toneOf(tab)}">
+    return `<div class="item-row ${flags}" data-id="${esc(item.id)}" data-tone="${toneOf(tab)}" data-rarity="${rarityOf(item, tab, sub)}">
         ${check}${badge}
         <div class="item-info"><h3>${esc(item.name)}</h3>${subLabel ? `<span class="item-sub">${esc(subLabel)}</span>` : ""}</div>
         ${slider}
@@ -426,7 +438,8 @@ function planCard(slot) {
     const name = item ? esc(item.name) : (allDone ? "All proficient" : "No progress yet");
     // Skills and weapons share names across categories (two different "Striker"s), so say which one this is.
     const what = item && PLAN_SHOW_SUB.has(slot.pool) ? CATEGORIES[where.tab].subs[where.sub].label : "";
-    return `<button type="button" class="plan-card ${item ? "" : "empty"}" data-plan="${slot.pool}"${slot.sec ? ` data-sec="${slot.sec}"` : ""}>
+    const rarity = item ? rarityOf(item, where.tab, where.sub) : "";
+    return `<button type="button" class="plan-card ${item ? "" : "empty"}" data-plan="${slot.pool}"${slot.sec ? ` data-sec="${slot.sec}"` : ""}${rarity ? ` data-rarity="${rarity}"` : ""}>
         <span class="plan-icon">${icon}</span>
         <span class="plan-text">
             <span class="plan-slot">${slot.label}${what ? ` \u00b7 ${esc(what)}` : ""}</span>
