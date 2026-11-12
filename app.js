@@ -453,57 +453,66 @@ function planCard(slot, pick = null) {
 }
 
 // --- Best loadout: what you could actually equip at once, following the game's limits ---
-// Weapons: one exotic across Primary, Secondary and Sidearm (Specialization is separate).
-// Gear: one exotic piece; the other slots take named pieces, or a gear set (4 pieces) / brand (3 pieces)
-// when that scores higher. Score = sum of ranks, with a set or brand counting its rank once per piece.
-// Ties go set, then brand, then named pieces. The NinjaBike backpack lowers the need to 3 set / 2 brand pieces.
+// Goal: the highest total rank across the slots. A gear set or brand counts its rank once per piece it fills.
+// Weapons: at most one exotic across Primary, Secondary and Sidearm (Specialization is separate).
+// Gear: at most one exotic piece; the other slots take named pieces, or a gear set (4 pieces) / brand
+// (3 pieces). The NinjaBike backpack lowers that to 3 set / 2 brand pieces, so it can win even when it
+// isn't the closest exotic. Ties go: set, then brand, then named pieces, then having an exotic in.
 // Skills: the two closest of different skill types.
 const GEAR_SLOTS = ["masks", "backpacks", "bodyArmor", "gloves", "holsters", "kneepads"];
+const GEAR_LABEL = { masks: "Mask", backpacks: "Backpack", bodyArmor: "Body Armor", gloves: "Gloves", holsters: "Holster", kneepads: "Kneepads" };
 const NINJABIKE = "exg_ninjabike_messenger_backpack";
 const byRank = (a, b) => rankOf(b.id) - rankOf(a.id) || byName(a, b);
 const subOf = item => planIndex.get(item.id).sub;
+const rankSum = items => items.reduce((t, i) => t + (i ? rankOf(i.id) : 0), 0);
+const better = (a, b) => { for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] > b[i]; return false; };
 
-function bestLoadout() {
-    const out = {};
-    const exoticNote = kind => `Only 1 exotic ${kind} can be equipped`;
-
-    // Weapons
+function bestWeapons() {
     const prim = inProgress(PLAN_POOLS.weapons.pool());
     const side = inProgress(PLAN_POOLS.sidearm.pool());
-    const exW = [...prim, ...side].filter(i => i.exotic).sort(byRank)[0];
     const plainPrim = prim.filter(i => !i.exotic);
     const plainSide = side.filter(i => !i.exotic);
-    let primary, secondary, sidearm;
-    if (exW && side.includes(exW)) { sidearm = exW; [primary, secondary] = plainPrim; }
-    else if (exW) { primary = exW; secondary = plainPrim[0]; sidearm = plainSide[0]; }
-    else { [primary, secondary] = prim; sidearm = side[0]; }
-    const wNote = (picked, normal) => (normal && normal !== picked && normal.exotic ? exoticNote("weapon") : "");
-    out.Primary = { item: primary, note: wNote(primary, prim[0]) };
-    out.Secondary = { item: secondary, note: wNote(secondary, prim[1]) };
-    out.Sidearm = { item: sidearm, note: wNote(sidearm, side[0]) };
+    // Options: no exotic, the closest exotic primary-type weapon, or the closest exotic sidearm.
+    const options = [{ primary: plainPrim[0], secondary: plainPrim[1], sidearm: plainSide[0], ex: 0 }];
+    const exP = prim.find(i => i.exotic);
+    const exS = side.find(i => i.exotic);
+    if (exP) options.push({ primary: exP, secondary: plainPrim[0], sidearm: plainSide[0], ex: 1 });
+    if (exS) options.push({ primary: plainPrim[0], secondary: plainPrim[1], sidearm: exS, ex: 1 });
+    let best = null;
+    for (const o of options) {
+        o.key = [rankSum([o.primary, o.secondary, o.sidearm]), o.ex];
+        if (!best || better(o.key, best.key)) best = o;
+    }
+    const note = (picked, normal) => (normal && normal !== picked && normal.exotic ? "Only 1 exotic weapon can be equipped" : "");
+    return {
+        Primary: { item: best.primary, note: note(best.primary, prim[0]) },
+        Secondary: { item: best.secondary, note: note(best.secondary, prim[1]) },
+        Sidearm: { item: best.sidearm, note: note(best.sidearm, side[0]) },
+    };
+}
 
-    // Gear: exotic first
-    const lists = Object.fromEntries(GEAR_SLOTS.map(k => [k, inProgress(PLAN_POOLS[k].pool())]));
-    const exG = GEAR_SLOTS.flatMap(k => lists[k].filter(i => i.exotic)).sort(byRank)[0];
-    const exSlot = exG && GEAR_SLOTS.find(k => lists[k].includes(exG));
+// Best way to fill the gear slots around one exotic (or none).
+function solveGear(lists, exotic) {
+    const exSlot = exotic && GEAR_SLOTS.find(k => lists[k].includes(exotic));
     const free = GEAR_SLOTS.filter(k => k !== exSlot);
     const named = Object.fromEntries(free.map(k => [k, lists[k].find(i => !i.exotic)]));
-    const ninja = exG?.id === NINJABIKE;
+    const ninja = exotic?.id === NINJABIKE;
     const need = { set: ninja ? 3 : 4, brand: ninja ? 2 : 3 };
     const sets = inProgress(PLAN_POOLS.gearSets.pool());
     const brands = inProgress(PLAN_POOLS.brands.pool());
-    // Candidate groups: the closest set and the two closest brands (two brands only fit with 6 free slots or NinjaBike).
+    // Candidate groups: the closest set and the two closest brands (more never fit in 6 slots).
     const groups = [
         sets[0] && { key: "S", kind: "set", item: sets[0], need: need.set },
         brands[0] && { key: "B1", kind: "brand", item: brands[0], need: need.brand },
         brands[1] && { key: "B2", kind: "brand", item: brands[1], need: need.brand },
     ].filter(Boolean);
     const choices = ["N", ...groups.map(g => g.key)];
+    const exRank = exotic ? rankOf(exotic.id) : 0;
     let best = null;
     const assign = new Array(free.length);
     (function walk(i) {
         if (i === free.length) {
-            let score = 0, setPieces = 0, brandPieces = 0;
+            let score = exRank, setPieces = 0, brandPieces = 0;
             for (const g of groups) {
                 const n = assign.filter(a => a === g.key).length;
                 if (n && n !== g.need) return;
@@ -511,32 +520,46 @@ function bestLoadout() {
                 if (g.kind === "set") setPieces += n; else brandPieces += n;
             }
             free.forEach((k, j) => { if (assign[j] === "N" && named[k]) score += rankOf(named[k].id); });
-            const key = [score, setPieces, brandPieces];
-            if (!best || key[0] > best.key[0] || (key[0] === best.key[0] && (key[1] > best.key[1] || (key[1] === best.key[1] && key[2] > best.key[2]))))
-                best = { key, assign: [...assign] };
+            const key = [score, setPieces, brandPieces, exotic ? 1 : 0];
+            if (!best || better(key, best.key)) best = { key, assign: [...assign] };
             return;
         }
         for (const c of choices) { assign[i] = c; walk(i + 1); }
     })(0);
+    return { key: best.key, exotic, exSlot, ninja, free, named, groups, assign: best.assign };
+}
 
-    const gearLabel = { masks: "Mask", backpacks: "Backpack", bodyArmor: "Body Armor", gloves: "Gloves", holsters: "Holster", kneepads: "Kneepads" };
-    if (exSlot) out[gearLabel[exSlot]] = { item: exG, note: ninja ? "Sets need 3 pieces, brands 2" : "" };
-    free.forEach((k, j) => {
-        const g = groups.find(x => x.key === best.assign[j]);
-        if (g) out[gearLabel[k]] = { item: g.item, pool: g.kind === "set" ? "gearSets" : "brands", part: g.kind === "set" ? "Gear set" : "Brand" };
-        else {
-            const normal = lists[k][0];
-            out[gearLabel[k]] = { item: named[k], note: normal && normal.exotic && normal !== named[k] ? exoticNote("gear piece") : "" };
-        }
+function bestGear() {
+    const lists = Object.fromEntries(GEAR_SLOTS.map(k => [k, inProgress(PLAN_POOLS[k].pool())]));
+    // Try no exotic, the closest exotic in each slot, and the NinjaBike backpack (its set/brand bonus can win).
+    const tries = [null, ...GEAR_SLOTS.map(k => lists[k].find(i => i.exotic)), lists.backpacks.find(i => i.id === NINJABIKE)];
+    let best = null;
+    for (const ex of new Set(tries)) {
+        if (ex === undefined) continue;
+        const r = solveGear(lists, ex);
+        if (!best || better(r.key, best.key)) best = r;
+    }
+    const out = {};
+    if (best.exSlot) out[GEAR_LABEL[best.exSlot]] = { item: best.exotic, note: best.ninja ? "Sets need 3 pieces, brands 2" : "" };
+    best.free.forEach((k, j) => {
+        const g = best.groups.find(x => x.key === best.assign[j]);
+        if (g) { out[GEAR_LABEL[k]] = { item: g.item, pool: g.kind === "set" ? "gearSets" : "brands", part: g.kind === "set" ? "Gear set" : "Brand" }; return; }
+        const normal = lists[k][0];
+        out[GEAR_LABEL[k]] = { item: best.named[k], note: normal && normal.exotic && normal !== best.named[k] ? "Only 1 exotic gear piece can be equipped" : "" };
     });
+    return out;
+}
 
-    // Skills: different types
+function bestLoadout() {
     const skills = inProgress(PLAN_POOLS.skills.pool());
     const s1 = skills[0];
     const s2 = s1 && skills.find(i => subOf(i) !== subOf(s1));
-    out["Skill 1"] = { item: s1 };
-    out["Skill 2"] = { item: s2, note: skills[1] && skills[1] !== s2 && s1 && subOf(skills[1]) === subOf(s1) ? "Must be a different skill type" : "" };
-    return out;
+    return {
+        ...bestWeapons(),
+        ...bestGear(),
+        "Skill 1": { item: s1 },
+        "Skill 2": { item: s2, note: skills[1] && skills[1] !== s2 && s1 && subOf(skills[1]) === subOf(s1) ? "Must be a different skill type" : "" },
+    };
 }
 
 const planZeroToggle = () => `<label class="chip-toggle"><input type="checkbox" data-plan-zero ${ui.planZero ? "checked" : ""}><span>Include 0/10</span></label>`;
@@ -546,7 +569,7 @@ function renderPlanner() {
     const loadout = ui.planBest ? bestLoadout() : null;
     const any = Object.values(PLAN_POOLS).some(p => inProgress(p.pool()).length);
     const hint = !any ? "Nothing is in progress yet. Give items a rank in the Tracker, or turn on Include 0/10 to see where to start."
-        : ui.planBest ? "The closest build you can equip at once: 1 exotic weapon, 1 exotic gear piece, 2 different skill types. A gear set or brand takes gear slots when it beats the pieces it replaces."
+        : ui.planBest ? "The build you can equip at once with the highest total proficiency: up to 1 exotic weapon and 1 exotic gear piece, 2 different skill types, and gear sets or brands where they add up to more than the pieces they replace."
         : ui.planZero ? "Closest to proficiency in each slot, including items you haven't started. Click a card to see the list."
         : "Closest to proficiency in each slot. Click a card to see everything in progress for it.";
     document.getElementById("planner").innerHTML =
