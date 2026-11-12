@@ -103,7 +103,7 @@ const activeProfile = () => profiles.list.find(p => p.id === profiles.active);
 
 // userProgress: { [itemId]: rank } for the active profile
 let userProgress = load(progressKey(profiles.active), {});
-const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game", sort: "name", mode: "tracker", planZero: false }, load(UI_KEY, {}));
+const ui = Object.assign({ tab: "weapons", subs: {}, search: "", hideDone: false, theme: "dark", compact: false, navOpen: true, bg: "glow", bgDim: 55, bgBlur: 0, order: "game", sort: "name", mode: "tracker", planZero: false, planBest: false }, load(UI_KEY, {}));
 if (!CATEGORIES[ui.tab]) ui.tab = "weapons";
 ui.view = ui.mode === "planner" ? "plan" : "hub"; // start on the page you used last
 ui.planSlot = null;
@@ -423,10 +423,12 @@ const inProgress = pool => pool
     .filter(i => { const r = rankOf(i.id); return r < MAX_RANK && (ui.planZero || r > 0); })
     .sort((a, b) => rankOf(b.id) - rankOf(a.id) || byName(a, b));
 
-function planCard(slot) {
+// pick (Best loadout only): { item, pool, part, note } overrides what the slot shows.
+function planCard(slot, pick = null) {
     if (!slot) return `<div class="plan-spacer" aria-hidden="true"></div>`;
-    const pool = PLAN_POOLS[slot.pool].pool();
-    const item = inProgress(pool)[slot.n];
+    const poolKey = pick?.pool || slot.pool;
+    const pool = PLAN_POOLS[poolKey].pool();
+    const item = pick ? pick.item : inProgress(pool)[slot.n];
     const allDone = pool.length > 0 && pool.every(i => isDone(i.id));
     const where = item && planIndex.get(item.id);
     const collection = where && (where.tab === "brands" || where.tab === "gearSets");
@@ -437,30 +439,126 @@ function planCard(slot) {
     const flag = item ? `${item.named ? "named" : ""} ${item.exotic ? "exotic" : ""}` : "";
     const name = item ? esc(item.name) : (allDone ? "All proficient" : "No progress yet");
     // Skills and weapons share names across categories (two different "Striker"s), so say which one this is.
-    const what = item && PLAN_SHOW_SUB.has(slot.pool) ? CATEGORIES[where.tab].subs[where.sub].label : "";
+    const what = pick?.part || (item && PLAN_SHOW_SUB.has(slot.pool) ? CATEGORIES[where.tab].subs[where.sub].label : "");
     const rarity = item ? rarityOf(item, where.tab, where.sub) : "";
-    return `<button type="button" class="plan-card ${item ? "" : "empty"}" data-plan="${slot.pool}"${slot.sec ? ` data-sec="${slot.sec}"` : ""}${rarity ? ` data-rarity="${rarity}"` : ""}>
+    return `<button type="button" class="plan-card ${item ? "" : "empty"}" data-plan="${poolKey}"${slot.sec ? ` data-sec="${slot.sec}"` : ""}${rarity ? ` data-rarity="${rarity}"` : ""}${pick?.note ? ` title="${esc(pick.note)}"` : ""}>
         <span class="plan-icon">${icon}</span>
         <span class="plan-text">
             <span class="plan-slot">${slot.label}${what ? ` \u00b7 ${esc(what)}` : ""}</span>
             <span class="plan-name ${flag}">${name}</span>
             <span class="plan-meter"><span class="plan-bar"><i style="width:${rank * 10}%"></i></span><b>${item ? `${rank}/${MAX_RANK}` : "\u2013"}</b></span>
+            ${pick?.note ? `<span class="plan-note">${esc(pick.note)}</span>` : ""}
         </span>
     </button>`;
 }
 
+// --- Best loadout: what you could actually equip at once, following the game's limits ---
+// Weapons: one exotic across Primary, Secondary and Sidearm (Specialization is separate).
+// Gear: one exotic piece; the other slots take named pieces, or a gear set (4 pieces) / brand (3 pieces)
+// when that scores higher. Score = sum of ranks, with a set or brand counting its rank once per piece.
+// Ties go set, then brand, then named pieces. The NinjaBike backpack lowers the need to 3 set / 2 brand pieces.
+// Skills: the two closest of different skill types.
+const GEAR_SLOTS = ["masks", "backpacks", "bodyArmor", "gloves", "holsters", "kneepads"];
+const NINJABIKE = "exg_ninjabike_messenger_backpack";
+const byRank = (a, b) => rankOf(b.id) - rankOf(a.id) || byName(a, b);
+const subOf = item => planIndex.get(item.id).sub;
+
+function bestLoadout() {
+    const out = {};
+    const exoticNote = kind => `Only 1 exotic ${kind} can be equipped`;
+
+    // Weapons
+    const prim = inProgress(PLAN_POOLS.weapons.pool());
+    const side = inProgress(PLAN_POOLS.sidearm.pool());
+    const exW = [...prim, ...side].filter(i => i.exotic).sort(byRank)[0];
+    const plainPrim = prim.filter(i => !i.exotic);
+    const plainSide = side.filter(i => !i.exotic);
+    let primary, secondary, sidearm;
+    if (exW && side.includes(exW)) { sidearm = exW; [primary, secondary] = plainPrim; }
+    else if (exW) { primary = exW; secondary = plainPrim[0]; sidearm = plainSide[0]; }
+    else { [primary, secondary] = prim; sidearm = side[0]; }
+    const wNote = (picked, normal) => (normal && normal !== picked && normal.exotic ? exoticNote("weapon") : "");
+    out.Primary = { item: primary, note: wNote(primary, prim[0]) };
+    out.Secondary = { item: secondary, note: wNote(secondary, prim[1]) };
+    out.Sidearm = { item: sidearm, note: wNote(sidearm, side[0]) };
+
+    // Gear: exotic first
+    const lists = Object.fromEntries(GEAR_SLOTS.map(k => [k, inProgress(PLAN_POOLS[k].pool())]));
+    const exG = GEAR_SLOTS.flatMap(k => lists[k].filter(i => i.exotic)).sort(byRank)[0];
+    const exSlot = exG && GEAR_SLOTS.find(k => lists[k].includes(exG));
+    const free = GEAR_SLOTS.filter(k => k !== exSlot);
+    const named = Object.fromEntries(free.map(k => [k, lists[k].find(i => !i.exotic)]));
+    const ninja = exG?.id === NINJABIKE;
+    const need = { set: ninja ? 3 : 4, brand: ninja ? 2 : 3 };
+    const sets = inProgress(PLAN_POOLS.gearSets.pool());
+    const brands = inProgress(PLAN_POOLS.brands.pool());
+    // Candidate groups: the closest set and the two closest brands (two brands only fit with 6 free slots or NinjaBike).
+    const groups = [
+        sets[0] && { key: "S", kind: "set", item: sets[0], need: need.set },
+        brands[0] && { key: "B1", kind: "brand", item: brands[0], need: need.brand },
+        brands[1] && { key: "B2", kind: "brand", item: brands[1], need: need.brand },
+    ].filter(Boolean);
+    const choices = ["N", ...groups.map(g => g.key)];
+    let best = null;
+    const assign = new Array(free.length);
+    (function walk(i) {
+        if (i === free.length) {
+            let score = 0, setPieces = 0, brandPieces = 0;
+            for (const g of groups) {
+                const n = assign.filter(a => a === g.key).length;
+                if (n && n !== g.need) return;
+                score += n * rankOf(g.item.id);
+                if (g.kind === "set") setPieces += n; else brandPieces += n;
+            }
+            free.forEach((k, j) => { if (assign[j] === "N" && named[k]) score += rankOf(named[k].id); });
+            const key = [score, setPieces, brandPieces];
+            if (!best || key[0] > best.key[0] || (key[0] === best.key[0] && (key[1] > best.key[1] || (key[1] === best.key[1] && key[2] > best.key[2]))))
+                best = { key, assign: [...assign] };
+            return;
+        }
+        for (const c of choices) { assign[i] = c; walk(i + 1); }
+    })(0);
+
+    const gearLabel = { masks: "Mask", backpacks: "Backpack", bodyArmor: "Body Armor", gloves: "Gloves", holsters: "Holster", kneepads: "Kneepads" };
+    if (exSlot) out[gearLabel[exSlot]] = { item: exG, note: ninja ? "Sets need 3 pieces, brands 2" : "" };
+    free.forEach((k, j) => {
+        const g = groups.find(x => x.key === best.assign[j]);
+        if (g) out[gearLabel[k]] = { item: g.item, pool: g.kind === "set" ? "gearSets" : "brands", part: g.kind === "set" ? "Gear set" : "Brand" };
+        else {
+            const normal = lists[k][0];
+            out[gearLabel[k]] = { item: named[k], note: normal && normal.exotic && normal !== named[k] ? exoticNote("gear piece") : "" };
+        }
+    });
+
+    // Skills: different types
+    const skills = inProgress(PLAN_POOLS.skills.pool());
+    const s1 = skills[0];
+    const s2 = s1 && skills.find(i => subOf(i) !== subOf(s1));
+    out["Skill 1"] = { item: s1 };
+    out["Skill 2"] = { item: s2, note: skills[1] && skills[1] !== s2 && s1 && subOf(skills[1]) === subOf(s1) ? "Must be a different skill type" : "" };
+    return out;
+}
+
 const planZeroToggle = () => `<label class="chip-toggle"><input type="checkbox" data-plan-zero ${ui.planZero ? "checked" : ""}><span>Include 0/10</span></label>`;
+const planBestToggle = () => `<label class="chip-toggle"><input type="checkbox" data-plan-best ${ui.planBest ? "checked" : ""}><span>Best loadout</span></label>`;
 
 function renderPlanner() {
+    const loadout = ui.planBest ? bestLoadout() : null;
     const any = Object.values(PLAN_POOLS).some(p => inProgress(p.pool()).length);
     const hint = !any ? "Nothing is in progress yet. Give items a rank in the Tracker, or turn on Include 0/10 to see where to start."
+        : ui.planBest ? "The closest build you can equip at once: 1 exotic weapon, 1 exotic gear piece, 2 different skill types. A gear set or brand takes gear slots when it beats the pieces it replaces."
         : ui.planZero ? "Closest to proficiency in each slot, including items you haven't started. Click a card to see the list."
         : "Closest to proficiency in each slot. Click a card to see everything in progress for it.";
     document.getElementById("planner").innerHTML =
-        `<div class="plan-tools"><p class="plan-hint">${hint}</p>${planZeroToggle()}</div>` +
+        `<div class="plan-tools"><p class="plan-hint">${hint}</p><div class="plan-toggles">${planBestToggle()}${planZeroToggle()}</div></div>` +
         PLAN.map(s => `<section class="hub-section plan-section" data-sec="${s.sec}">
             <h2>${s.title}</h2>
-            <div class="plan-grid">${s.slots.map(planCard).join("")}</div>
+            <div class="plan-grid">${s.slots.map(slot => {
+                if (!loadout || !slot || slot.pool === "spec") return planCard(slot);
+                // Brand and Gear Set are part of the build in this mode, not slots of their own.
+                if (slot.pool === "brands" || slot.pool === "gearSets") return planCard(null);
+                return planCard(slot, loadout[slot.label]);
+            }).join("")}</div>
         </section>`).join("");
 }
 
@@ -573,6 +671,7 @@ document.getElementById("mode-switch").addEventListener("click", e => {
 });
 
 document.addEventListener("change", e => {
+    if (e.target.matches("[data-plan-best]")) { ui.planBest = e.target.checked; save(UI_KEY, ui); renderAll(); return; }
     if (!e.target.matches("[data-plan-zero]")) return;
     ui.planZero = e.target.checked;
     save(UI_KEY, ui);

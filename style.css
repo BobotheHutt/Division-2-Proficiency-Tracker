@@ -620,3 +620,7 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 .item-row[data-rarity]:not([data-rarity=""]):hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); border-left-color: var(--accent); }
 .item-row[data-rarity]:not([data-rarity=""]).done { border-color: var(--accent); }
 .item-row[data-rarity]:not([data-rarity=""]) .item-icon { color: var(--accent); }
+
+/* Planner toggles and Best loadout notes */
+.plan-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
+.plan-note { font-size: 11px; color: var(--muted); line-height: 1.2; }
