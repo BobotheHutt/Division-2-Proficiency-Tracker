@@ -562,18 +562,13 @@ function bestLoadout() {
     };
 }
 
-const planZeroToggle = () => `<label class="chip-toggle"><input type="checkbox" data-plan-zero ${ui.planZero ? "checked" : ""}><span>Include 0/10</span></label>`;
-const planBestToggle = () => `<label class="chip-toggle"><input type="checkbox" data-plan-best ${ui.planBest ? "checked" : ""}><span>Best loadout</span></label>`;
+const planZeroToggle = () => `<label class="chip-toggle" title="Also show items you haven't started"><input type="checkbox" data-plan-zero ${ui.planZero ? "checked" : ""}><span>Include 0/10</span></label>`;
+const planBestToggle = () => `<label class="chip-toggle" title="The build you can equip at once with the highest total proficiency: 1 exotic weapon, 1 exotic gear piece, 2 different skill types, with gear sets or brands where they add up to more"><input type="checkbox" data-plan-best ${ui.planBest ? "checked" : ""}><span>Best loadout</span></label>`;
 
 function renderPlanner() {
     const loadout = ui.planBest ? bestLoadout() : null;
-    const any = Object.values(PLAN_POOLS).some(p => inProgress(p.pool()).length);
-    const hint = !any ? "Nothing is in progress yet. Give items a rank in the Tracker, or turn on Include 0/10 to see where to start."
-        : ui.planBest ? "The build you can equip at once with the highest total proficiency: up to 1 exotic weapon and 1 exotic gear piece, 2 different skill types, and gear sets or brands where they add up to more than the pieces they replace."
-        : ui.planZero ? "Closest to proficiency in each slot, including items you haven't started. Click a card to see the list."
-        : "Closest to proficiency in each slot. Click a card to see everything in progress for it.";
     document.getElementById("planner").innerHTML =
-        `<div class="plan-tools"><p class="plan-hint">${hint}</p><div class="plan-toggles">${planBestToggle()}${planZeroToggle()}</div></div>` +
+        `<div class="plan-tools"><div class="plan-toggles">${planBestToggle()}${planZeroToggle()}</div></div>` +
         PLAN.map(s => `<section class="hub-section plan-section" data-sec="${s.sec}">
             <h2>${s.title}</h2>
             <div class="plan-grid">${s.slots.map(slot => {

@@ -526,7 +526,7 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 :root[data-theme="light"] .account-chip[data-state="ok"] .sync-dot { background: #16a34a; color: #16a34a; }
 
 /* Planner: hint + the 0/10 toggle on one row */
-.plan-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.plan-tools { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 18px; }
 .plan-tools .plan-hint { margin: 0; }
 
 .chip-toggle { position: relative; }
@@ -624,3 +624,4 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 /* Planner toggles and Best loadout notes */
 .plan-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
 .plan-note { font-size: 11px; color: var(--muted); line-height: 1.2; }
+.plan-toggles .chip-toggle span { font-weight: 600; } /* same width checked or not, so the toggles never shift */
