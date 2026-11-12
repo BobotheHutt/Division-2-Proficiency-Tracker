@@ -625,3 +625,18 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 .plan-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
 .plan-note { font-size: 11px; color: var(--muted); line-height: 1.2; }
 .plan-toggles .chip-toggle span { font-weight: 600; } /* same width checked or not, so the toggles never shift */
+
+/* Planner toggle tooltips: styled, anchored to the right edge of the toggle group so they never leave the page */
+.plan-toggles { position: relative; }
+.plan-toggles .chip-toggle { position: static; }
+.plan-toggles .chip-toggle[data-tip]::after {
+    content: attr(data-tip); position: absolute; top: calc(100% + 8px); right: 0; z-index: 20;
+    width: max-content; max-width: min(300px, calc(100vw - 32px)); white-space: normal;
+    padding: 9px 12px; border-radius: 10px; font-size: 12px; font-weight: 500; line-height: 1.45; text-align: left;
+    color: var(--text); background: var(--surface); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+    box-shadow: var(--shadow); pointer-events: none;
+    opacity: 0; transform: translateY(-4px); transition: opacity .15s, transform .15s; transition-delay: 0s;
+}
+.plan-toggles .chip-toggle[data-tip]:hover::after,
+.plan-toggles .chip-toggle[data-tip]:focus-within::after { opacity: 1; transform: none; transition-delay: .35s; }
+@media (hover: none) { .plan-toggles .chip-toggle[data-tip]::after { display: none; } }

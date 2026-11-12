@@ -441,7 +441,7 @@ function planCard(slot, pick = null) {
     // Skills and weapons share names across categories (two different "Striker"s), so say which one this is.
     const what = pick?.part || (item && PLAN_SHOW_SUB.has(slot.pool) ? CATEGORIES[where.tab].subs[where.sub].label : "");
     const rarity = item ? rarityOf(item, where.tab, where.sub) : "";
-    return `<button type="button" class="plan-card ${item ? "" : "empty"}" data-plan="${poolKey}"${slot.sec ? ` data-sec="${slot.sec}"` : ""}${rarity ? ` data-rarity="${rarity}"` : ""}${pick?.note ? ` title="${esc(pick.note)}"` : ""}>
+    return `<button type="button" class="plan-card ${item ? "" : "empty"}" data-plan="${poolKey}"${slot.sec ? ` data-sec="${slot.sec}"` : ""}${rarity ? ` data-rarity="${rarity}"` : ""}>
         <span class="plan-icon">${icon}</span>
         <span class="plan-text">
             <span class="plan-slot">${slot.label}${what ? ` \u00b7 ${esc(what)}` : ""}</span>
@@ -562,8 +562,8 @@ function bestLoadout() {
     };
 }
 
-const planZeroToggle = () => `<label class="chip-toggle" title="Also show items you haven't started"><input type="checkbox" data-plan-zero ${ui.planZero ? "checked" : ""}><span>Include 0/10</span></label>`;
-const planBestToggle = () => `<label class="chip-toggle" title="The build you can equip at once with the highest total proficiency: 1 exotic weapon, 1 exotic gear piece, 2 different skill types, with gear sets or brands where they add up to more"><input type="checkbox" data-plan-best ${ui.planBest ? "checked" : ""}><span>Best loadout</span></label>`;
+const planZeroToggle = () => `<label class="chip-toggle" data-tip="Also show items you haven't started yet"><input type="checkbox" data-plan-zero ${ui.planZero ? "checked" : ""}><span>Include 0/10</span></label>`;
+const planBestToggle = () => `<label class="chip-toggle" data-tip="The build you can wear at once with the highest total proficiency. Up to 1 exotic weapon and 1 exotic gear piece, 2 different skill types, and gear sets or brands where they add up to more."><input type="checkbox" data-plan-best ${ui.planBest ? "checked" : ""}><span>Best loadout</span></label>`;
 
 function renderPlanner() {
     const loadout = ui.planBest ? bestLoadout() : null;
