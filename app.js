@@ -144,7 +144,7 @@ const pctOf = ({ done, total }) => (total ? Math.round((done / total) * 100) : 0
 let currentUser = null;
 let syncTimer = null;
 
-// The header chip shows the signed-in Google email; its dot shows sync state (green saved, orange busy, red failed).
+// The header shows the Google profile picture (email on hover); its dot shows sync state (green saved, orange busy, red failed).
 function setSyncStatus(text) {
     const chip = document.getElementById("account-chip");
     chip.dataset.state = !text ? "" : /fail/i.test(text) ? "failed" : /saving|syncing/i.test(text) ? "busy" : "ok";
@@ -1032,12 +1032,30 @@ const cloudParts = document.querySelectorAll(".needs-cloud");
 const headerSignIn = document.getElementById("header-signin");
 const accountInfo = document.getElementById("account-info");
 
+// Google profile picture in the header; falls back to the first letter of the email if there's no picture
+// or it fails to load. no-referrer: Google's image host can refuse requests that carry another site's referrer.
+function renderAvatar() {
+    const box = document.getElementById("account-avatar");
+    const chip = document.getElementById("account-chip");
+    if (!currentUser) { box.innerHTML = ""; chip.removeAttribute("aria-label"); return; }
+    const who = currentUser.email || currentUser.displayName || "";
+    chip.setAttribute("aria-label", `Signed in as ${who}`);
+    const initial = () => { box.textContent = (who.trim()[0] || "?"); };
+    if (!currentUser.photoURL) { initial(); return; }
+    const img = new Image();
+    img.alt = "";
+    img.referrerPolicy = "no-referrer";
+    img.onerror = initial;
+    img.src = currentUser.photoURL;
+    box.replaceChildren(img);
+}
+
 function renderAuth() {
     const signedIn = !!currentUser;
     authButtons.forEach(b => { b.textContent = signedIn ? "Log out" : (b === headerSignIn ? "Sign in" : "Sign in with Google"); b.disabled = false; });
     headerSignIn.hidden = signedIn;
     document.getElementById("account-chip").hidden = !signedIn;
-    document.getElementById("account-email").textContent = signedIn ? currentUser.email : "";
+    renderAvatar();
     accountInfo.textContent = signedIn
         ? `Signed in as ${currentUser.email}. Progress syncs across devices.`
         : "Not signed in. Progress is saved in this browser only.";

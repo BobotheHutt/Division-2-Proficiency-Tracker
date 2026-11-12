@@ -500,24 +500,27 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 #settings-btn svg { filter: drop-shadow(0 0 5px rgba(255, 140, 0, .5)); transition: transform .3s; }
 :root[data-theme="light"] #settings-btn svg { filter: none; }
 #settings-btn:hover svg { transform: rotate(45deg); }
+/* Signed-in Google account: profile picture (or initial) in a ring, with the sync dot as a corner badge */
 .account-chip {
-    display: inline-flex; align-items: center; gap: 8px; max-width: 260px; padding: 5px 13px; border-radius: 999px;
-    font-size: 12px; font-weight: 700;
-    border: 1px solid color-mix(in srgb, #ff8a3d 55%, var(--border));
-    background: linear-gradient(90deg, rgba(255, 102, 0, .20), rgba(255, 215, 0, .10));
+    position: relative; flex: none; width: 34px; height: 34px; border-radius: 50%; padding: 2px;
+    background: linear-gradient(135deg, #ff6600, #ffd700);
 }
-.sync-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--muted); color: var(--muted); box-shadow: 0 0 8px currentColor; }
+.account-chip[hidden] { display: none; }
+.avatar {
+    display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
+    background: var(--surface-2); color: var(--accent); font-size: 14px; font-weight: 800; text-transform: uppercase;
+    box-shadow: 0 0 0 2px var(--surface);
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sync-dot {
+    position: absolute; right: -1px; bottom: -1px; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--muted); color: var(--muted); border: 2px solid var(--surface); box-shadow: 0 0 6px currentColor;
+}
 .account-chip[data-state="ok"] .sync-dot { background: #4ade80; color: #4ade80; }
 .account-chip[data-state="busy"] .sync-dot { background: #ff6600; color: #ff6600; }
 .account-chip[data-state="failed"] .sync-dot { background: #ef4444; color: #ef4444; }
-#account-email {
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    background: linear-gradient(90deg, #ff8a3d, #ffd700); -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-:root[data-theme="light"] #account-email { background-image: linear-gradient(90deg, #c2410c, #a16207); }
-:root[data-theme="light"] .account-chip { background: linear-gradient(90deg, rgba(230, 92, 0, .12), rgba(184, 134, 11, .08)); }
+:root[data-theme="light"] .account-chip { background: linear-gradient(135deg, #e65c00, #b8860b); }
 :root[data-theme="light"] .account-chip[data-state="ok"] .sync-dot { background: #16a34a; color: #16a34a; }
-@media (max-width: 640px) { .account-chip { max-width: 132px; padding: 4px 9px; gap: 6px; } }
 
 /* Planner: hint + the 0/10 toggle on one row */
 .plan-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
@@ -525,10 +528,9 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 
 .chip-toggle { position: relative; }
 
-/* Phones: keep logo, email chip and gear on one row; the Tracker/Planner switch gets its own row below */
+/* Phones: keep logo, profile, account picture and gear on one row; the Tracker/Planner switch gets its own row below */
 @media (max-width: 640px) {
     .header-actions { margin-left: auto; gap: 6px; }
-    .account-chip { max-width: 112px; }
     .brand h1 .brand-name { font-size: 14px; }
     .brand-sub { letter-spacing: .2em; }
 }
@@ -561,12 +563,6 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 .menu-check { width: 14px; flex: none; text-align: center; font-weight: 700; }
 .menu-sep { height: 1px; background: var(--border); margin: 6px 4px; }
 @media (max-width: 640px) { .profile-btn { max-width: 84px; padding: 4px 8px 4px 10px; } }
-/* Narrow phones: the email chip shrinks to its sync dot so logo, profile and gear stay on one row
-   (the full email is in the chip's tooltip and in Settings > Account). */
-@media (max-width: 480px) {
-    .account-chip { padding: 9px; }
-    #account-email { display: none; }
-}
 @media (max-width: 360px) { .profile-btn { max-width: 64px; } .header-actions { gap: 4px; } }
 
 /* Add-profile field inside the header dropdown */
