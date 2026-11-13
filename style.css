@@ -645,3 +645,8 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
    It lights up again on hover or while it's being dragged. */
 .item-row.done .rank-wrap { opacity: .18; filter: grayscale(.7); transition: opacity .15s, filter .15s; }
 .item-row.done:hover .rank-wrap, .item-row.done .rank-wrap:focus-within { opacity: 1; filter: none; }
+
+/* Expertise level on the home page */
+.xp-level { color: var(--accent); font-size: 16px; }
+body.view-hub .xp-level { background: linear-gradient(90deg, #ff6600, #ffd700); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.xp-max { margin-left: 6px; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); vertical-align: 2px; }

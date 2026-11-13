@@ -253,6 +253,21 @@ function renderListNav() {
         <div class="subnav" ${ui.navOpen ? "" : "hidden"}>${cards}</div>`;
 }
 
+// Account expertise: every proficiency rank on any item is one point. Points needed for each level 1-30
+// (from the game): levels 1-3 cost 100 each, 4-15 cost 200, 16-21 cost 140, 22-30 cost 90. Max 30 at 4,350.
+const EXPERTISE_COSTS = [...Array(3).fill(100), ...Array(12).fill(200), ...Array(6).fill(140), ...Array(9).fill(90)];
+function expertise() {
+    const points = allItems().reduce((t, i) => t + Math.min(rankOf(i.id), MAX_RANK), 0);
+    let level = 0, start = 0;
+    for (const cost of EXPERTISE_COSTS) {
+        if (points < start + cost) return { points, level, start, next: start + cost, pct: Math.floor(((points - start) / cost) * 100) };
+        start += cost;
+        level++;
+    }
+    return { points, level, start, next: null, pct: 100 };
+}
+const fmt = n => n.toLocaleString("en-US");
+
 function renderSummary() {
     const label = document.getElementById("summary-label");
     if (ui.view === "planlist") {
@@ -260,6 +275,16 @@ function renderSummary() {
         label.textContent = `${def.title}: ${inProgress(def.pool()).length} in progress`;
         return;
     }
+    // Home page: expertise level and progress to the next level (search still shows match counts).
+    if (ui.view === "hub" && !query()) {
+        const x = expertise();
+        label.innerHTML = `Expertise Level <b class="xp-level">${x.level}</b>${x.next ? "" : ` <span class="xp-max">Max</span>`}`;
+        document.getElementById("summary-pct").textContent = x.next ? `${fmt(x.points)} / ${fmt(x.next)}` : `${fmt(x.points)} points`;
+        document.getElementById("summary-pct").title = x.next ? `${fmt(x.next - x.points)} points to level ${x.level + 1}` : "";
+        document.getElementById("summary-bar").style.width = `${x.pct}%`;
+        return;
+    }
+    document.getElementById("summary-pct").title = "";
     let items, name;
     if (ui.view === "hub") { items = allItems(); name = "Overall"; }
     else { const sub = CATEGORIES[ui.tab].subs[activeSubKey()]; items = sub.items; name = sub.label; }
