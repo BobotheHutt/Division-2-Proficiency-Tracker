@@ -29,7 +29,7 @@ export const pistols = [
     { id: "pistol_x_45_tactical", name: "X-45 Tactical", variant: "Pistol" },
     { id: "pistol_kard_45", name: "Kard-45", variant: "Pistol" },
     { id: "pistol_tdi_kard_custom", name: "TDI \"Kard\" Custom", variant: "Pistol", named: true },
-    { id: "pistol_police_686_magnum_2", name: "Police 686 Magnum", variant: "Pistol" },
+    { id: "pistol_police_686_magnum_2", name: "586 Magnum", variant: "Pistol" },
     { id: "pistol_rabid_d50", name: "Rabid D50", variant: "Pistol", named: true },
     { id: "pistol_the_crooked_strap", name: "The Crooked Strap", variant: "Pistol", named: true }
 ];
