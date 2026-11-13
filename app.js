@@ -795,10 +795,105 @@ searchBox.addEventListener("input", () => {
     jumpToFirstMatch();
     save(UI_KEY, ui);
     renderAll();
+    renderSuggest();
 });
-// "/" focuses search from anywhere; Esc clears it.
+
+// --- Search suggestions: matching items under the box; picking one opens its category and points it out ---
+const suggestBox = document.getElementById("search-suggest");
+const SUGGEST_MAX = 8;
+const searchIndex = Object.entries(CATEGORIES).flatMap(([tab, c]) =>
+    Object.entries(c.subs).flatMap(([sub, s]) => s.items.map(item => ({ item, tab, sub, where: s.label }))));
+let suggestions = [];
+let suggestActive = -1;
+
+function closeSuggest() {
+    suggestBox.hidden = true;
+    suggestBox.innerHTML = "";
+    suggestions = [];
+    suggestActive = -1;
+    searchBox.setAttribute("aria-expanded", "false");
+    searchBox.removeAttribute("aria-activedescendant");
+}
+
+function renderSuggest() {
+    const q = query();
+    if (!q) { closeSuggest(); return; }
+    // Names that start with the text come first, then words that start with it, then anything containing it.
+    const score = n => (n.startsWith(q) ? 0 : n.split(/[\s\-'.]+/).some(w => w.startsWith(q)) ? 1 : 2);
+    suggestions = searchIndex
+        .filter(e => e.item.name.toLowerCase().includes(q))
+        .map(e => ({ ...e, s: score(e.item.name.toLowerCase()) }))
+        .sort((a, b) => a.s - b.s || byName(a.item, b.item))
+        .slice(0, SUGGEST_MAX);
+    if (!suggestions.length) {
+        suggestBox.innerHTML = `<li class="suggest-empty">No items match</li>`;
+        suggestBox.hidden = false;
+        searchBox.setAttribute("aria-expanded", "true");
+        return;
+    }
+    suggestActive = Math.min(suggestActive, suggestions.length - 1);
+    const mark = name => {
+        const i = name.toLowerCase().indexOf(q);
+        return `${esc(name.slice(0, i))}<mark>${esc(name.slice(i, i + q.length))}</mark>${esc(name.slice(i + q.length))}`;
+    };
+    suggestBox.innerHTML = suggestions.map((e, i) => {
+        const rank = rankOf(e.item.id);
+        return `<li role="option" id="sg-${i}" class="suggest-item ${i === suggestActive ? "active" : ""}" data-rarity="${rarityOf(e.item, e.tab, e.sub)}" data-sg="${i}" aria-selected="${i === suggestActive}">
+            <span class="sg-name ${e.item.named ? "named" : ""} ${e.item.exotic ? "exotic" : ""}">${mark(e.item.name)}</span>
+            <span class="sg-where">${esc(e.where)}</span>
+            <span class="sg-rank ${rank >= MAX_RANK ? "done" : ""}">${rank >= MAX_RANK ? "\u2713" : `${rank}/${MAX_RANK}`}</span>
+        </li>`;
+    }).join("");
+    suggestBox.hidden = false;
+    searchBox.setAttribute("aria-expanded", "true");
+    if (suggestActive >= 0) searchBox.setAttribute("aria-activedescendant", `sg-${suggestActive}`);
+    else searchBox.removeAttribute("aria-activedescendant");
+}
+
+function pickSuggestion(i) {
+    const e = suggestions[i];
+    if (!e) return;
+    closeSuggest();
+    searchBox.value = "";
+    ui.search = "";
+    if (ui.hideDone && isDone(e.item.id)) { ui.hideDone = false; hideBox.checked = false; }
+    openCategory(e.tab, e.sub);
+    searchBox.blur();
+    const row = document.querySelector(`#items-grid [data-id="${CSS.escape(e.item.id)}"]`);
+    if (!row) return;
+    row.scrollIntoView({ block: "center" });
+    row.classList.remove("flash");
+    void row.offsetWidth; // restart the animation if it's the same row
+    row.classList.add("flash");
+    setTimeout(() => row.classList.remove("flash"), 1800);
+}
+
+searchBox.addEventListener("keydown", e => {
+    if (suggestBox.hidden || !suggestions.length) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        const n = suggestions.length;
+        suggestActive = e.key === "ArrowDown" ? (suggestActive + 1) % n : (suggestActive - 1 + n) % n;
+        renderSuggest();
+        document.getElementById(`sg-${suggestActive}`)?.scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") {
+        e.preventDefault();
+        pickSuggestion(Math.max(suggestActive, 0));
+    }
+});
+searchBox.addEventListener("focus", () => { if (query()) renderSuggest(); });
+searchBox.addEventListener("blur", () => setTimeout(closeSuggest, 120));
+// mousedown (not click) so the box doesn't lose focus and close before the pick registers.
+suggestBox.addEventListener("mousedown", e => {
+    const li = e.target.closest("[data-sg]");
+    if (!li) return;
+    e.preventDefault();
+    pickSuggestion(Number(li.dataset.sg));
+});
+// "/" focuses search from anywhere; Esc closes the suggestions, then clears the search.
 document.addEventListener("keydown", e => {
     if (e.key === "/" && !e.target.closest("input, textarea")) { e.preventDefault(); searchBox.focus(); }
+    else if (e.key === "Escape" && e.target === searchBox && !suggestBox.hidden) closeSuggest();
     else if (e.key === "Escape" && e.target === searchBox && searchBox.value) {
         searchBox.value = ""; ui.search = ""; save(UI_KEY, ui); renderAll();
     }
