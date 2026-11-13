@@ -665,12 +665,9 @@ body.view-hub .controls-inner > .toolbar { flex: 1 1 0; min-width: 0; }
 }
 :root[data-theme="light"] .xp-num { background-image: linear-gradient(90deg, #c2410c, #a16207); }
 .xp-cap { margin-top: 3px; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.xp-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
-.xp-text { display: flex; align-items: baseline; gap: 10px; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; }
-.xp-title { font-weight: 700; }
-#xp-progress { color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
-#xp-progress b { color: var(--text); }
-.xp-to { margin-left: 4px; }
+.xp-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.xp-title { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+#xp-progress { align-self: center; font-size: 14px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
 .xp-bar { height: 8px; border-radius: 4px; }
 #xp-bar { background: linear-gradient(90deg, #ff6600, #ffd700); border-radius: 4px; }
 @media (max-width: 640px) {

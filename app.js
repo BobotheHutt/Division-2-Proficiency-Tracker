@@ -282,8 +282,8 @@ function renderSummary() {
         const x = expertise();
         document.getElementById("xp-level").textContent = x.level;
         document.getElementById("xp-progress").innerHTML = x.next
-            ? `<b>${fmt(x.points - x.start)}</b> / ${fmt(x.next - x.start)} <span class="xp-to">to Level ${x.level + 1}</span>`
-            : `<b>Max level</b> <span class="xp-to">${fmt(x.points)} points</span>`;
+            ? `${fmt(x.points - x.start)} / ${fmt(x.next - x.start)}`
+            : "Max";
         document.getElementById("xp-bar").style.width = `${x.pct}%`;
         xpBox.setAttribute("aria-label", x.next
             ? `Expertise level ${x.level}, ${x.points - x.start} of ${x.next - x.start} points to level ${x.level + 1}`
