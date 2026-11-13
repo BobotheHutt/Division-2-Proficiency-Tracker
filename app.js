@@ -275,16 +275,21 @@ function renderSummary() {
         label.textContent = `${def.title}: ${inProgress(def.pool()).length} in progress`;
         return;
     }
-    // Home page: expertise level and progress to the next level (search still shows match counts).
-    if (ui.view === "hub" && !query()) {
+    // Home page: expertise level, with progress through the current level (shown in its own block).
+    const xpBox = document.getElementById("xp");
+    xpBox.hidden = ui.view !== "hub";
+    if (ui.view === "hub") {
         const x = expertise();
-        label.innerHTML = `Expertise Level <b class="xp-level">${x.level}</b>${x.next ? "" : ` <span class="xp-max">Max</span>`}`;
-        document.getElementById("summary-pct").textContent = x.next ? `${fmt(x.points)} / ${fmt(x.next)}` : `${fmt(x.points)} points`;
-        document.getElementById("summary-pct").title = x.next ? `${fmt(x.next - x.points)} points to level ${x.level + 1}` : "";
-        document.getElementById("summary-bar").style.width = `${x.pct}%`;
+        document.getElementById("xp-level").textContent = x.level;
+        document.getElementById("xp-progress").innerHTML = x.next
+            ? `<b>${fmt(x.points - x.start)}</b> / ${fmt(x.next - x.start)} <span class="xp-to">to Level ${x.level + 1}</span>`
+            : `<b>Max level</b> <span class="xp-to">${fmt(x.points)} points</span>`;
+        document.getElementById("xp-bar").style.width = `${x.pct}%`;
+        xpBox.setAttribute("aria-label", x.next
+            ? `Expertise level ${x.level}, ${x.points - x.start} of ${x.next - x.start} points to level ${x.level + 1}`
+            : `Expertise level ${x.level}, max`);
         return;
     }
-    document.getElementById("summary-pct").title = "";
     let items, name;
     if (ui.view === "hub") { items = allItems(); name = "Overall"; }
     else { const sub = CATEGORIES[ui.tab].subs[activeSubKey()]; items = sub.items; name = sub.label; }
