@@ -640,3 +640,8 @@ body.view-plan #reset-btn, body.view-planlist #reset-btn { display: none; }
 .plan-toggles .chip-toggle[data-tip]:hover::after,
 .plan-toggles .chip-toggle[data-tip]:focus-within::after { opacity: 1; transform: none; transition-delay: .35s; }
 @media (hover: none) { .plan-toggles .chip-toggle[data-tip]::after { display: none; } }
+
+/* Proficient items: the rank bar fades back so the bars still in progress stand out.
+   It lights up again on hover or while it's being dragged. */
+.item-row.done .rank-wrap { opacity: .18; filter: grayscale(.7); transition: opacity .15s, filter .15s; }
+.item-row.done:hover .rank-wrap, .item-row.done .rank-wrap:focus-within { opacity: 1; filter: none; }
