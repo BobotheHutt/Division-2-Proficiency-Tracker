@@ -22,7 +22,7 @@ export const lmgs = [
     { id: "lmg_good_times", name: "Good Times", variant: "LMG", named: true },
     { id: "lmg_mg5", name: "MG5", variant: "LMG" },
     { id: "lmg_infantry_mg5", name: "Infantry MG5", variant: "LMG" },
-    { id: "lmg_bellringer", name: "Bellringer", variant: "LMG", named: true },
+    { id: "lmg_bellringer", name: "Bell Ringer", variant: "LMG", named: true },
     { id: "lmg_big_show", name: "Big Show", variant: "LMG", named: true },
     { id: "lmg_sleipner", name: "Sleipner", variant: "LMG", named: true },
     { id: "lmg_iron_lung", name: "Iron Lung", variant: "LMG", exotic: true },
